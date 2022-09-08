@@ -1,0 +1,20 @@
+%YAML 1.1
+---
+
+name: "steal_buy"
+asset_type: "fund"
+stock_code: ["000661","605358","002415","000063","000338", "600276", "000895", "601166","000651"]
+fund_code: ['001632','004753']
+stock_db: "db_file/stock.db"
+fund_db: "db_file/fund.db"
+start_date: "2015-08-01"
+end_date: "2022-08-24"
+policy: [
+  #"policy/auto01.json",
+  #"policy/balance03.json"
+  #"policy/balance02.json",
+  #"policy/gerd01.json",
+  "policy/gerd03.json",
+  #"policy/martin01.json",
+  "policy/martin04.json",
+]

@@ -1,0 +1,12 @@
+{
+    "id": "martin01",
+    "type": "martin",
+    "asset_id": ["600276"],
+    "cash": 1000000,
+    "start_charge": null,
+    "percent": 0.01,
+    "asset_count": 0,
+    "asset_percent": null,
+    "buy_count": 10000,
+    "sell_percent": 0.05
+}

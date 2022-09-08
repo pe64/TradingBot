@@ -1,0 +1,11 @@
+{
+    "id": "balance01",
+    "type": "balance",
+    "asset_id": ["600276"],
+    "cash": 100000,
+    "start_charge": null,
+    "percent": 0.01,
+    "asset_count": [ 0 ],
+    "asset_percent": [ 0.5 ],
+    "sell_percent": null
+}

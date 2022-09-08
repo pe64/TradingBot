@@ -1,0 +1,413 @@
+%YAML 1.1
+---
+
+db:
+  db_type: "sqlite"
+
+sqlite_path: 
+  fund: "db_file/fund.db"
+  stock: "db_file/stock.db"
+  em: "db_file/em.db"
+
+logging:
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  file: log/trading.log
+  level: "info"
+  date_format: "%m-%d-%Y %H:%M:%S %p"
+
+
+web_api:
+  fund:
+    url: "https://fundmobapi.eastmoney.com"
+    path: "/FundMApi/"
+    all_fund_url: "https://fund.eastmoney.com/js/fundcode_search.js"
+    headers: 
+      accept: "application/json, text/plain, */*"
+      accept_language: "zh-CN,zh;q=0.9"
+      cache_control: "no-cache"
+      connection: "keep-alive"
+      pragma: "no-cache"
+      sec_fetch_dest: "empty"
+      sec_fetch_mode: "cors"
+      sec_fetch_site: "none"
+      user_agent: "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/94.0.4606.71"
+      sec_ch_ua: "\"Chromium\";v=\"104\", \" Not A;Brand\";v=\"99\", \"Google Chrome\";v=\"104\""
+      sec_ch_ua_mobile: "?0"
+      sec_ch_ua_platform: "macOS"
+        
+    real_time_charge:
+      arguments: [
+        "deviceid=Wap", 
+        "plat=Wap", 
+        "product=EFund", 
+        "version=2.0.0"] 
+
+      file: "FundVarietieValuationDetail.ashx"
+    history_charge:
+      arguments: [
+        "deviceid=Wap", 
+        "plat=Wap", 
+        "product=EFund", 
+        "version=2.0.0",
+        "RANGE=ln"] 
+
+      file: "FundNetDiagram.ashx"
+    
+    cta_api:
+      private_key: "conf/private.pem"
+      arguments: "conf/login.json"
+  stock:
+    url: "http://push2his.eastmoney.com"
+    path: "/api/qt/stock/kline/get"
+    market:
+      sz: "0"
+      sh: "1"
+    arguments: [
+      "cb=jsonp1661231193243",
+      "ut=fa5fd1943c7b386f172d6893dbfba10b",
+      "fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13",
+      "fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+      "klt=101",
+      "rtntype=6",
+      "fqt=0",
+      "beg=0",
+      "end=20500101",
+      #"smplmt=460",
+      #"lmt=1000000"
+    ]
+    headers: 
+      accept: "*/*"
+      accept_language: "zh-CN,zh;q=0.9"
+      cache_control: "no-cache"
+      connection: "keep-alive"
+      pragma: "no-cache"
+      referer: "http://quote.eastmoney.com/"
+      user_agent: "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/94.0.4606.71"
+      sec_gpc: 1
+
+
+fund51:
+  cookie: "cache/fund51.txt"
+  headers_comm: [
+    "Accept-Language: zh-CN,zh;q=0.9",
+    "Cache-Control: no-cache",
+    "Connection: keep-alive" ,
+    "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+    "Sec-Fetch-Dest: empty" ,
+    "Sec-Fetch-Mode: cors" ,
+    "Sec-Fetch-Site: same-origin" ,
+    "sec-ch-ua: \"Chromium\";v=\"104\", \" Not A;Brand\";v=\"99\", \"Google Chrome\";v=\"104\"",
+    "sec-ch-ua-mobile: ?0", 
+    "sec-ch-ua-platform: \"macOS\"" 
+  ]
+  ver_code: 
+    file: "cache/fund51.png"
+    url: "https://trade.5ifund.com/validateCode.action"
+    headers: [
+      "Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+      "pragma: no-cache",
+      "Referer: https://trade.5ifund.com/login/loginInit.action",
+      "sec-fetch-dest: image",
+      "sec-fetch-mode: no-cors",
+    ]
+
+  login:
+    url: "https://trade.5ifund.com/login/login.action"
+    #url: "https://trade.5ifund.com/pc_query/incomelogin.action"
+    headers: [ 
+      "Accept: */*",
+      "Content-Type: application/x-www-form-urlencoded",
+      "Origin: https://trade.5ifund.com",
+      "Pragma: no-cache",
+      "Referer: https://trade.5ifund.com/login/loginInit.action",
+      "X-Requested-With: XMLHttpRequest",
+      "sec-gpc: 1"
+    ]
+    private_key: "conf/private.pem"
+    arguments: "conf/login.json"
+  balance:
+    url: "https://trade.5ifund.com/pc_query/trade_queryIncomeWjZeroList.action"
+    headers: [
+      "Accept: application/json, text/javascript, */*; q=0.01",
+      "Referer: https://trade.5ifund.com/pc/",
+      "X-Requested-With: XMLHttpRequest"
+    ]
+  status: 
+    url: "https://trade.5ifund.com/pc_query/trade_currentShareList.action"
+    headers: [
+      "Accept: application/json, text/javascript, */*; q=0.01",
+      "Referer: https://trade.5ifund.com/pc/" ,
+      "X-Requested-With: XMLHttpRequest" ,
+    ]
+  countid:
+    url: "https://trade.5ifund.com/trade/pc_buyInitOne.action"
+    headers: [
+      "Accept: application/json, text/javascript, */*; q=0.01",
+      "Pragma: no-cache",
+      "X-Requested-With: XMLHttpRequest",
+      "Referer: https://trade.5ifund.com/account/buy/buy.html",
+      "sec-gpc: 1"
+    ]
+  buyfund:
+    url: "https://trade.5ifund.com/trade/pc_sendZG.action"
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+      'Origin: https://trade.5ifund.com',
+      'Pragma: no-cache',
+      'Referer: https://trade.5ifund.com/account/buy/buy.html?fundCode=003096&frm=hd_d3&amount=20.00',
+      'X-Requested-With: XMLHttpRequest',
+      'sec-gpc: 1'
+    ]
+
+  checktime:
+    url: "https://trade.5ifund.com/mydwr/dwr_callCheckWorkTime.action"
+    headers: [
+      'Accept: */*',
+      'Pragma: no-cache',
+      'Referer: https://trade.5ifund.com/account/buy/buy.html',
+      'X-Requested-With: XMLHttpRequest',
+      'sec-gpc: 1'
+    ]
+  checkpwd:
+    url: "https://trade.5ifund.com/mydwr/dwr_callCheckTradeLogin.action"
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+      'Origin: https://trade.5ifund.com',
+      'Pragma: no-cache',
+      'Referer: https://trade.5ifund.com/account/buy/buy.html',
+      'X-Requested-With: XMLHttpRequest',
+      'sec-gpc: 1'
+    ]
+  order:
+    url: "https://trade.5ifund.com/pc_query/trade_getCurrentListPC.action"
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Pragma: no-cache',
+      'Referer: https://trade.5ifund.com/account/revoke/home.html',
+      'X-Requested-With: XMLHttpRequest',
+      'sec-gpc: 1'
+    ]
+  
+  revoke:
+    url: "https://trade.5ifund.com/trade/pc_revoke.action"
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+      'Origin: https://trade.5ifund.com',
+      'Pragma: no-cache',
+      'Referer: https://trade.5ifund.com/account/revoke/index.html',
+      'X-Requested-With: XMLHttpRequest',
+      'sec-gpc: 1'
+    ]
+  buyorder:
+    url: "https://trade.5ifund.com/pc_query/trade_queryShenBuyTradeList.action"
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Pragma: no-cache',
+      'Referer: https://trade.5ifund.com/pc/traderecord/detail_shen.html',
+      'X-Requested-With: XMLHttpRequest',
+      'sec-gpc: 1'
+    ]
+  redem:
+    url: "https://trade.5ifund.com/trade/pc_shareRedemption.action"
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://trade.5ifund.com',
+      'Pragma: no-cache',
+      'Referer: https://trade.5ifund.com/pc/index/redeem.html',
+      'X-Requested-With: XMLHttpRequest',
+      'sec-gpc: 1'
+    ]
+  autobuy_order:
+    url: "https://trade.5ifund.com/pc_query/trade_queryAipTradeList.action"
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Referer: https://trade.5ifund.com/pc/traderecord.html',
+      'X-Requested-With: XMLHttpRequest',
+      'sec-gpc: 1',
+    ]
+
+eastmoney:
+  cookie: "cache/emcookie" 
+  headers_comm: [
+    'Accept-Language: zh-CN,zh;q=0.9',
+    'Cache-Control: no-cache',
+    'Connection: keep-alive',
+    'Sec-Fetch-Dest: empty',
+    'Sec-Fetch-Mode: no-cors',
+    'Sec-Fetch-Site: same-origin',
+    'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36',
+    'sec-ch-ua: "Chromium";v="104", " Not A;Brand";v="99", "Google Chrome";v="104"',
+    'sec-ch-ua-mobile: ?0',
+    'sec-ch-ua-platform: "macOS"',
+    'sec-gpc: 1'
+  ]
+  ver_code:
+    file: "cache/em.png"
+    url: "https://jywg.18.cn/Login/YZM"
+    headers: [
+      'Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/Login',
+      'Sec-Fetch-Dest: image',
+    ]
+  
+  login:
+    private_key: "conf/eastmoney.pem"
+    arguments: "conf/eastmoney.json" 
+    url: "https://jywg.18.cn/Login/Authentication?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/Login?el=1&clear=1',
+      'X-Requested-With: XMLHttpRequest'
+    ]
+  validatekey:
+    url: "https://jywg.18.cn/Trade/Buy"
+    headers: [
+      'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/Login?el=1&clear=&returl=%2fTrade%2fBuy',
+      'Sec-Fetch-Dest: document' ,
+      'Sec-Fetch-Mode: navigate',
+      'Sec-Fetch-User: ?1',
+      'Upgrade-Insecure-Requests: 1'
+    ]
+  sign_contract:
+    url: "https://jywg.18.cn/Finance/Suitability/SignContract?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/FundTrade/Purchase',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+
+  check_sdx:
+    url: "https://jywg.18.cn/OTCTrade/CheckSdxV2?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/FundTrade/Purchase',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+  check_status:
+    url: "https://jywg.18.cn/FundTrade/CheckContractSignStatus?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/FundTrade/Purchase',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+  fund_submit_trade:
+    url: "https://jywg.18.cn/FundTrade/SubmitTrade?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/FundTrade/Purchase',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+  get_revoke_list:
+    url: "https://jywg.18.cn/FundTrade/GetRevokeList?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+  fund_revoke_orders:
+    url: "https://jywg.18.cn/FundTrade/RevokeOrders?validatekey="
+    headers: [
+      'Accept: text/plain, */*; q=0.01' ,
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/FundTrade/Revoke',
+      'X-Requested-With: XMLHttpRequest'
+    ]
+  get_fund_position:
+    url: "https://jywg.18.cn/FundTrade/GetFundPosition?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded' ,
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/FundTrade/Redeem',
+      'X-Requested-With: XMLHttpRequest' ,
+    ]
+  
+  get_fund_his_deals:
+    url: https://jywg.18.cn/FundTrade/GetHisDeals?validatekey=
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Referer: https://jywg.18.cn/FundTrade/QueryHisDeals',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+
+  stock_submit_trade:
+    url: "https://jywg.18.cn/Trade/SubmitTradeV2?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/Trade/Buy',
+      'X-Requested-With: XMLHttpRequest',
+
+    ]
+
+  stock_get_revokes:
+    url: "https://jywg.18.cn/Trade/GetRevokeList?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Length: 0' ,
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/Trade/Revoke',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+  
+  stock_revoke_order:
+    url: "https://jywg.18.cn/Trade/RevokeOrders?validatekey="
+    headers: [
+      'Accept: text/plain, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache' ,
+      'Referer: https://jywg.18.cn/Trade/Revoke',
+      'X-Requested-With: XMLHttpRequest' ,
+    ]
+
+  stock_list:
+    url: "https://jywg.18.cn/Search/GetStockList?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn' ,
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/Trade/Sale',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+  stock_real_charge:
+    url: "https://hsmarketwg.eastmoney.com/api/SHSZQuoteSnapshot?id="
+    headers: [
+      'Accept: */*',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/',
+      'Sec-Fetch-Dest: script',
+    ]

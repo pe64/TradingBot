@@ -1,0 +1,180 @@
+import time
+import datetime 
+from http_opt.eastmoney import HttpEM
+from db.em_sqlite import SqliteEM
+from http_opt.fund_http import fund_http_real_time_charge
+from policy.policy import Policy
+
+def time_last_nday(date, days):
+    ret = (datetime.datetime.strptime(date, "%Y-%m-%d") + 
+            datetime.timedelta(days=days)).strftime("%Y-%m-%d")
+    return ret
+
+class EastMoneyCta:
+    def __init__(self, cf) -> None:
+        self.em = []
+        self.em_sq = SqliteEM(cf['sqlite_path']['em'])
+        accounts = self.em_sq.get_accounts()
+        for account in accounts:
+            self.em.append(HttpEM(cf, account['arg'], account['id']))
+        self.gconf=cf
+        self.policy = []
+        self.today = time.strftime("%Y%m%d", time.localtime())
+        self.st = '14:40'
+        self.et = '15:00'
+        self.init_flag = 0
+        pass
+
+    def init_policy(self, em):
+        for policy in self.em_sq.get_account_policy(em.account_id):
+            asset = self.em_sq.get_asset_by_id(policy['asset_id'])
+            contracts = self.em_sq.get_his_deals_by_step_and_policy(1, em.account_id, policy['id'], asset['code'])
+            for contract in contracts:
+                if contract['direction'] == "111":
+                    policy['asset_count'] = float(policy['asset_count']) + float(contract['vol'])
+                    policy['cash_into'] = float(policy['cash_into']) + float(contract['cash'])
+                    self.em_sq.update_policy_asset_count(policy['id'], policy['asset_count'], float(policy['cash_into']))
+                    self.em_sq.update_his_deals_step(contract['contract_id'], 2)
+
+            if len(asset) == 0:
+                continue
+            policy['asset_id'] = asset['code']
+            p = Policy(policy, self) 
+            self.policy.append(p)
+            print("账户:%s 策略:%s 剩余现金:%s元 已投入金额:%s元 目标资产:%s."%(em.get_user_id(), p.name, policy['cash'].center(8), policy['cash_inuse'].center(8), asset['name']))
+        pass
+
+    def login(self):
+        for em in self.em:
+            while False== em.get_validate_key():
+                em.login_em_ver_code()
+                em.login_em_platform()
+
+            if self.init_flag == 0:
+                print("账户:%s 登陆成功。"%(em.get_user_id()))
+                self.update_account_status(em)
+                self.init_policy(em)
+                self.init_flag = 1
+
+    def update_account_status(self, em):
+        r_dic = {}
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        st = time_last_nday(today, -7)
+        records = em.fund_get_his_deals(st, today)
+        for record in records:
+            r_dic[record['Wtbh']] = record
+            pass
+
+        if len(r_dic) == 0:
+            return
+        
+        contracts = self.em_sq.get_his_deals_contract_by_step(0, em.account_id)
+        for contract in contracts:
+            if contract in r_dic:
+                record = r_dic.get(contract)
+                self.em_sq.update_his_deals_vol(contract, record['Cjfe'], record['Cjrq'])
+    
+    def cta_run(self):
+        self.login()
+        funds = self.em_sq.get_fund_self_selection() 
+        self.today = time.strftime("%Y%m%d", time.localtime())
+        for fund in funds:
+            ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['code']).get("Expansion")
+            if len(ret['GSZZL']) !=0:
+                for p in self.policy:
+                    p.execute(fund['code'], ret['GZ'], float(ret['GSZZL']), self.today)
+        
+        stocks = self.em_sq.get_stock_self_selection()
+        for stock in stocks:
+            ret = self.em[0].get_stock_real_charge(stock['code'], stock['market'])
+            if ret is not None:
+                for p in self.policy:
+                    p.execute(stock['code'], float(ret['currentPrice']), float(ret['zdf']), self.today)
+            pass
+
+    
+    def update_policy_id(self):
+        pass
+
+    def buy_fund(self, em, code, vol):
+        em.check_sdx(code)
+        em.check_status(code, None)
+        em.sign_contract(code)
+        return em.fund_submit_trade(code, vol, "buy")
+    
+    def sale_fund(self, em, code, vol, company):
+        em.check_status(code, company)
+        return em.fund_submit_trade(code, vol, "sale")
+
+    def check_fund_time(self):
+        st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.st, '%Y-%m-%d%H:%M')
+        et = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.et, '%Y-%m-%d%H:%M')
+        now_time = datetime.datetime.now()
+
+        return now_time > st and now_time < et
+
+    def buy_stock(self, code, price, vol):
+        pass
+    
+    def sale_stock(self, code, price, vol):
+        return None
+
+    def sale_asset(self, para):
+        ret = False
+        for em in self.em:
+            if em.account_id != para['account_id']:
+                continue
+            asset = self.em_sq.get_asset_by_code(para['code'])
+            contract = None
+            if asset['type'] == "f" and self.check_fund_time():
+                contract = self.sale_fund(em, para['code'], para['vol'], asset['market'])
+            elif asset['type'] == "s":
+                contract = self.sale_stock(em, para['code'], para['vol'])
+
+            if contract is None:
+                continue
+
+            self.em_sq.insert_his_deals(contract, em.account_id, para['policy_id'], para['code'], "112", para['vol'], self.today)
+            self.em_sq.update_policy_asset_count(para['policy_id'], para['asset_count'] - para['vol'])
+            print("\033[31m%s 账户:%s 触发卖出[%s:%s]条件，卖出%s份.\033[0m"%
+                (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), em.get_user_id(),asset['code'], asset['name'], para['vol']))
+            ret = True
+
+        return ret
+    
+    def calc_price(self, buy_count, price):
+        vol = (buy_count/price/100)*100
+        cash = buy_count - vol * price
+        return cash,vol
+
+    def buy_asset(self, para):
+        ret = False
+        vol = 0
+        free_cash = 0
+        
+        for em in self.em:
+            if em.account_id != para['account_id']:
+                continue
+            asset = self.em_sq.get_asset_by_code(para['code'])
+            contract = None
+            if asset['type'] == "f" and self.check_fund_time():
+                contract = self.buy_fund(em, para['code'], para['buy_count'])
+            elif asset['type'] == "s":
+                free_cash, vol = self.calc_price(para['buy_count'], para['price'])
+                contract = self.buy_stock(em, para['code'], vol, para['price'])
+            if contract is None:
+                continue
+            if asset['type'] == "f":
+                self.em_sq.insert_his_deals(contract, em.account_id, para['policy_id'], para['code'], "111", para['buy_count'], self.today)
+            elif asset['type'] == 's':
+                pass
+            print("\033[32m%s 账户:%s 触发买入[%s:%s]条件，买入%s元.\033[0m"%
+                (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), em.get_user_id(), asset['code'], asset['name'], para['buy_count']))
+
+            ret = True
+        
+        return ret, free_cash, vol
+    
+    def update_policy_status(self, policy_id, cash_inuse, cash, asset_count, today, price=None):
+        self.em_sq.update_policy_status(policy_id, cash_inuse, cash, asset_count, today, price)
+        pass
