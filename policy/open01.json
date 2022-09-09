@@ -1,0 +1,12 @@
+{
+    "type":"open",
+    "id":1,
+    "account_id": 1,
+    "asset_id": "004753",
+    "cash": 3000,
+    "para": "{\"percent\":\"0.005\",\"buy_count\": \"10.00\",\"period\":\"day\",\"hold\":\"0.15\",\"pause_percent\":\"0.001\"}",
+    "cash_into": 0.0,
+    "cash_inuse": 0.0,
+    "asset_count": 0.0,
+    "date": "19900909"
+}
