@@ -33,11 +33,11 @@ class Policy:
         return int(self.policy.id)
 
     def add_asset_count(self, asset_count):
-        self.policy.asset_count = self.policy.asset_count + asset_count
+        self.policy.asset_count = self.policy.asset_count + float(asset_count)
         return self.policy.asset_count
     
     def add_cash_into(self, cash):
-        self.policy.cash_into = self.policy.cash_into + cash
+        self.policy.cash_into = self.policy.cash_into + float(cash)
         return self.policy.cash_into
 
     def execute(self, code, current_charge, percent, date):

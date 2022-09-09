@@ -91,8 +91,8 @@ def main(argv):
             buyorder = f51.get_buy_order(n['appSheetSerialNo'])
             f51.revoke_order(buyorder)
         pass
-    elif argv[1] == "ocr":
-        ocr_fund51("cache/fund51.png")
+    #elif argv[1] == "ocr":
+        #ocr_fund51("cache/fund51.png")
     
     elif argv[1] == "fund51":
         cta51 = Fund51Cta(cf)

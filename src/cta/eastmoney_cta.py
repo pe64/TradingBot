@@ -1,4 +1,6 @@
+from os import PRIO_PROCESS
 import time
+import sys
 import datetime 
 from http_opt.eastmoney import HttpEM
 from db.em_sqlite import SqliteEM
@@ -114,7 +116,7 @@ class EastMoneyCta:
             if len(ret['GSZZL']) !=0:
                 today = time.strftime("%Y%m%d",time.strptime(ret['GZTIME'], "%Y-%m-%d %H:%M"))
                 for p in self.policy:
-                    p.execute(fund['code'], ret['GZ'], float(ret['GSZZL']), self.today)
+                    p.execute(fund['code'], ret['GZ'], float(ret['GSZZL']), today)
         
         stocks = self.em_sq.get_stock_self_selection()
         for stock in stocks:
@@ -122,7 +124,9 @@ class EastMoneyCta:
             if ret is not None:
                 for p in self.policy:
                     p.execute(stock['code'], float(ret['currentPrice']), float(ret['zdf']), self.today)
-            pass
+        
+        print(".", end="")
+        sys.stdout.flush()
 
     def buy_fund(self, em, code, vol):
         em.check_sdx(code)
@@ -184,13 +188,21 @@ class EastMoneyCta:
 
         return ret, order
     
-    def sale_stock(self, code, price, vol):
+    def sale_stock(self, em, code, price, vol):
         ret = False
         asset = self.em_sq.get_asset_by_code(code)
-
-
-
-        return None
+        if asset['market'] == "SH":
+            order = em.stock_submit_trade(code, asset['name'], price, vol, "HA", "S")
+        elif asset['market'] == "SZ":
+            order = em.stock_submit_trade(code, asset['name'], price, vol, "SA", "S")
+        
+        if order is not None:
+            ret = self.check_order_success(em, order)
+        
+        if ret is False:
+            order = None
+        
+        return ret, order
 
     def sale_asset(self, para):
         ret = False
