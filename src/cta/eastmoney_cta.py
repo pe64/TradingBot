@@ -64,6 +64,13 @@ class EastMoneyCta:
             print("账户:%s 策略:%s 剩余现金:%s元 已投入金额:%s元 目标资产:%s."%(em.get_user_id(), p.name, policy['cash'].center(8), policy['cash_inuse'].center(8), asset['name']))
         pass
 
+    def check_policy_update_time(self):
+        st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "19:30", '%Y-%m-%d%H:%M')
+        et = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "19:35", '%Y-%m-%d%H:%M')
+        now_time = datetime.datetime.now()
+
+        return now_time > st and now_time < et
+
     def login(self):
         for em in self.em:
             while False== em.get_validate_key():
@@ -76,6 +83,9 @@ class EastMoneyCta:
                 self.init_policy(em)
                 self.update_policy(em)
                 self.init_flag = 1
+            
+            if self.check_policy_update_time():
+                self.update_policy(em)
 
     def update_account_status(self, em):
         r_dic = {}
@@ -112,10 +122,6 @@ class EastMoneyCta:
                 for p in self.policy:
                     p.execute(stock['code'], float(ret['currentPrice']), float(ret['zdf']), self.today)
             pass
-
-    
-    def update_policy_id(self):
-        pass
 
     def buy_fund(self, em, code, vol):
         em.check_sdx(code)
