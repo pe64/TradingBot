@@ -112,6 +112,7 @@ class EastMoneyCta:
         for fund in funds:
             ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['code']).get("Expansion")
             if len(ret['GSZZL']) !=0:
+                today = time.strftime("%Y%m%d",time.strptime(ret['GZTIME'], "%Y-%m-%d %H:%M"))
                 for p in self.policy:
                     p.execute(fund['code'], ret['GZ'], float(ret['GSZZL']), self.today)
         

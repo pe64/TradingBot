@@ -7,7 +7,7 @@ import json
 from urllib import request,parse
 from http import cookiejar
 from crypto.rsa_crypto import JSEncrypt
-from ocr.ocr import ocr_fund51
+#from ocr.ocr import ocr_fund51
 
 def get_time_strl():
     return str(int(time.time() * 1000))

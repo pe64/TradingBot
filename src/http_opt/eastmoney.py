@@ -7,7 +7,7 @@ import time
 from http import cookiejar
 from urllib import request,parse
 from http_opt.fund51_http import get_time_day, get_time_strl
-from ocr.ocr import ocr_em
+#from ocr.ocr import ocr_em
 from crypto.rsa_crypto import JSEncrypt
 
 class HttpEM:
