@@ -6,7 +6,7 @@ import datetime
 import time
 from http import cookiejar
 from urllib import request,parse
-from http_opt.fund51_http import get_time_strl
+from http_opt.fund51_http import get_time_day, get_time_strl
 from ocr.ocr import ocr_em
 from crypto.rsa_crypto import JSEncrypt
 
@@ -38,6 +38,7 @@ class HttpEM:
         self.stock_list_conf = cf['eastmoney']['stock_list']
         self.get_fund_his_deals_conf = cf['eastmoney']['get_fund_his_deals']
         self.real_charge_conf = cf['eastmoney']['stock_real_charge']
+        self.deal_data_conf = cf['eastmoney']['stock_deal_data']
         self.validatekey = ""
         self.random = str(random.random())
         #with open(self.login_conf['arguments'], "r") as f:
@@ -274,26 +275,30 @@ class HttpEM:
         url = self.stock_revoke_order_conf['url'] + self.validatekey
         headers = self.build_headers(self.stock_revoke_order_conf['headers'])
         data = {
-            "revokes": order
+            "revokes": get_time_day()+"_"+order
         }
 
         js = self.http_post(url, arg=data, headers=headers)
         if js["Status"] == 0:
-            print("revoke success.")
+            return True
         else:
             print("revoke error [%s]"%js["Message"])
+            return False
     
-    def stock_submit_trade(self, scode, sname, price, amount, market):
+    def stock_submit_trade(self, scode, sname, price, amount, market, stype):
         url = self.stock_submit_trade_conf['url'] + self.validatekey
         headers = self.build_headers(self.stock_submit_trade_conf['headers'])
         data = {
             "stockCode":scode,
             "price":price,
             "amount":amount,
-            "tradeType":"B",
+            "tradeType":stype,
             "zqmc":sname,
             "market":market
         }
+        if stype == "S":
+            data['gddm'] = ""
+
         js = self.http_post(url, arg=data, headers=headers)
         if js["Status"] == 0:
             print("submit_success order [%s]"%js["Data"][0]["Wtbh"])
@@ -314,6 +319,21 @@ class HttpEM:
             return js["Data"]
         else:
             print("get stock list error. [%s]" %js["Message"])
+            return []
+    
+    def get_deal_data(self):
+        url = self.deal_data_conf['url'] + self.validatekey
+        headers = self.build_headers(self.deal_data_conf['headers'])
+        data = {
+            "qqhs": 1000,
+            "dwc": ""
+        }
+
+        js = self.http_post(url, data, headers)
+        if js["Status"] == 0:
+            return js["Data"]
+        else:
+            print("get stock deal data error %s"%js["Message"])
             return []
     
     def get_stock_real_charge(self, code, market):

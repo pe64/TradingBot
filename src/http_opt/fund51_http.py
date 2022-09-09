@@ -12,6 +12,9 @@ from ocr.ocr import ocr_fund51
 def get_time_strl():
     return str(int(time.time() * 1000))
 
+def get_time_day():
+    return time.strftime("%Y%m%d", time.localtime())
+
 class HttpFund51:
     def __init__(self, cf) -> None:
         #self.cookie = cookiejar.CookieJar() 

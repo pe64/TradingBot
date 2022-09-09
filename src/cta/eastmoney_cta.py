@@ -20,21 +20,41 @@ class EastMoneyCta:
         self.gconf=cf
         self.policy = []
         self.today = time.strftime("%Y%m%d", time.localtime())
-        self.st = '14:40'
-        self.et = '15:00'
         self.init_flag = 0
         pass
 
-    def init_policy(self, em):
+    def get_policy_obj_by_id(self, pid):
+        for p in self.policy:
+            if pid == p.get_policy_id():
+                return p
+
+        return None
+    
+    def update_policy(self, em):
         for policy in self.em_sq.get_account_policy(em.account_id):
             asset = self.em_sq.get_asset_by_id(policy['asset_id'])
             contracts = self.em_sq.get_his_deals_by_step_and_policy(1, em.account_id, policy['id'], asset['code'])
             for contract in contracts:
                 if contract['direction'] == "111":
-                    policy['asset_count'] = float(policy['asset_count']) + float(contract['vol'])
-                    policy['cash_into'] = float(policy['cash_into']) + float(contract['cash'])
-                    self.em_sq.update_policy_asset_count(policy['id'], policy['asset_count'], float(policy['cash_into']))
-                    self.em_sq.update_his_deals_step(contract['contract_id'], 2)
+                    p = self.get_policy_obj_by_id(policy['id'])
+                    if p is not None:
+                        asset_count = p.add_asset_count(contract['vol'])
+                        cash_into = p.add_cash_into(contract['cash'])
+                        self.em_sq.update_policy_asset_count(policy['id'], float(asset_count), float(cash_into))
+                        self.em_sq.update_his_deals_step(contract['contract_id'], 2)
+                        print("更新合约[%s]信息成功."%contract['contract_id'])
+
+
+    def init_policy(self, em):
+        for policy in self.em_sq.get_account_policy(em.account_id):
+            asset = self.em_sq.get_asset_by_id(policy['asset_id'])
+            #contracts = self.em_sq.get_his_deals_by_step_and_policy(1, em.account_id, policy['id'], asset['code'])
+            #for contract in contracts:
+            #    if contract['direction'] == "111":
+            #        policy['asset_count'] = float(policy['asset_count']) + float(contract['vol'])
+            #        policy['cash_into'] = float(policy['cash_into']) + float(contract['cash'])
+            #        self.em_sq.update_policy_asset_count(policy['id'], policy['asset_count'], float(policy['cash_into']))
+            #        self.em_sq.update_his_deals_step(contract['contract_id'], 2)
 
             if len(asset) == 0:
                 continue
@@ -54,6 +74,7 @@ class EastMoneyCta:
                 print("账户:%s 登陆成功。"%(em.get_user_id()))
                 self.update_account_status(em)
                 self.init_policy(em)
+                self.update_policy(em)
                 self.init_flag = 1
 
     def update_account_status(self, em):
@@ -100,23 +121,68 @@ class EastMoneyCta:
         em.check_sdx(code)
         em.check_status(code, None)
         em.sign_contract(code)
-        return em.fund_submit_trade(code, vol, "buy")
+        return True, em.fund_submit_trade(code, vol, "buy")
     
     def sale_fund(self, em, code, vol, company):
         em.check_status(code, company)
         return em.fund_submit_trade(code, vol, "sale")
 
+    def check_stock_time(self):
+        st1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "09:35", '%Y-%m-%d%H:%M')
+        et1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "11:25", '%Y-%m-%d%H:%M')
+        st2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "13:02", '%Y-%m-%d%H:%M')
+        et2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "14:55", '%Y-%m-%d%H:%M')
+        now_time = datetime.datetime.now()
+
+        return (now_time > st1 and now_time < et1) or (now_time > st2 and now_time < et2)
+
     def check_fund_time(self):
-        st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.st, '%Y-%m-%d%H:%M')
-        et = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.et, '%Y-%m-%d%H:%M')
+        st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "14:40", '%Y-%m-%d%H:%M')
+        et = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "14:59", '%Y-%m-%d%H:%M')
         now_time = datetime.datetime.now()
 
         return now_time > st and now_time < et
 
-    def buy_stock(self, code, price, vol):
-        pass
+    def check_order_success(em, order):
+        flags = True
+        ret = True
+        for times in range(1,3):
+            contracts = em.stock_get_revokes()
+            if order not in contracts:
+                flags = False
+                break
+            times = times + 1
+            time.sleep(5)
+
+        if flags == False:
+            ret = em.stock_revoke_order(order)
+        
+        return flags == True or ret == False
+
+
+    def buy_stock(self, em, code, price, vol):
+        ret = False
+        asset = self.em_sq.get_asset_by_code(code)
+
+        if asset['market'] == "SH":
+            order = em.stock_submit_trade(code,asset['name'],price,vol,"HA","B")
+        elif asset['market'] == "SZ":
+            order = em.stock_submit_trade(code,asset['name'],price,vol,"SA","B")
+
+        if order is not None:
+            ret = self.check_order_success(em, order)
+        
+        if ret is False:
+            order = None
+
+        return ret, order
     
     def sale_stock(self, code, price, vol):
+        ret = False
+        asset = self.em_sq.get_asset_by_code(code)
+
+
+
         return None
 
     def sale_asset(self, para):
@@ -128,14 +194,17 @@ class EastMoneyCta:
             contract = None
             if asset['type'] == "f" and self.check_fund_time():
                 contract = self.sale_fund(em, para['code'], para['vol'], asset['market'])
-            elif asset['type'] == "s":
-                contract = self.sale_stock(em, para['code'], para['vol'])
+            elif asset['type'] == "s" and self.check_stock_time():
+                contract = self.sale_stock(em, para['code'], para['vol'], asset['market'])
 
             if contract is None:
                 continue
+            
+            if asset['type'] == "f":
+                self.em_sq.insert_his_deals(contract, em.account_id, para['policy_id'], para['code'], "112", para['vol'], self.today)
+            elif asset['type'] == "s":
+                self.em_sq.insert_his_deals(contract, em.account_id, para['policy_id'], para['code'], "112", para['vol'], self.today, step=2) 
 
-            self.em_sq.insert_his_deals(contract, em.account_id, para['policy_id'], para['code'], "112", para['vol'], self.today)
-            self.em_sq.update_policy_asset_count(para['policy_id'], para['asset_count'] - para['vol'])
             print("\033[31m%s 账户:%s 触发卖出[%s:%s]条件，卖出%s份.\033[0m"%
                 (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), em.get_user_id(),asset['code'], asset['name'], para['vol']))
             ret = True
@@ -155,23 +224,27 @@ class EastMoneyCta:
         for em in self.em:
             if em.account_id != para['account_id']:
                 continue
+
             asset = self.em_sq.get_asset_by_code(para['code'])
             contract = None
             if asset['type'] == "f" and self.check_fund_time():
-                contract = self.buy_fund(em, para['code'], para['buy_count'])
-            elif asset['type'] == "s":
+                ret, contract = self.buy_fund(em, para['code'], para['buy_count'])
+            elif asset['type'] == "s" and self.check_stock_time():
                 free_cash, vol = self.calc_price(para['buy_count'], para['price'])
-                contract = self.buy_stock(em, para['code'], vol, para['price'])
-            if contract is None:
+                ret, contract = self.buy_stock(em, para['code'], vol, para['price'])
+
+            if contract is None or ret is False:
                 continue
+
             if asset['type'] == "f":
                 self.em_sq.insert_his_deals(contract, em.account_id, para['policy_id'], para['code'], "111", para['buy_count'], self.today)
             elif asset['type'] == 's':
+                self.em_sq.insert_his_deals(contract, em.account_id, para['policy_id'], para['code'], "111", para['buy_count']-free_cash, self.today, step=2)
                 pass
+
             print("\033[32m%s 账户:%s 触发买入[%s:%s]条件，买入%s元.\033[0m"%
                 (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), em.get_user_id(), asset['code'], asset['name'], para['buy_count']))
 
-            ret = True
         
         return ret, free_cash, vol
     

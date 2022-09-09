@@ -29,7 +29,17 @@ class Policy:
             self.policy = OpenPst(js, cta)
             self.name = "低吸建仓"
 
+    def get_policy_id(self):
+        return int(self.policy.id)
+
+    def add_asset_count(self, asset_count):
+        self.policy.asset_count = self.policy.asset_count + asset_count
+        return self.policy.asset_count
     
+    def add_cash_into(self, cash):
+        self.policy.cash_into = self.policy.cash_into + cash
+        return self.policy.cash_into
+
     def execute(self, code, current_charge, percent, date):
         self.policy.execute(code, current_charge, percent, date)
      

@@ -130,15 +130,15 @@ class SqliteEM:
         self.conn.commit()
 
 
-    def insert_his_deals(self, contract, a_id, p_id, code, dir, vol, today):
+    def insert_his_deals(self, contract, a_id, p_id, code, dir, vol, today, step=0):
         if dir == "111":
             cmd = 'INSERT INTO his_deals(account_id, policy_id, step, asset_id, contract_id, direction, cash, date)' \
-                    'VALUES ("%s", "%d", 0, "%s", "%s", "%s", "%s", "%s")' \
-                    %(a_id, p_id, code, contract, dir, str(vol), today)
+                    'VALUES ("%s", "%d", %d, "%s", "%s", "%s", "%s", "%s")' \
+                    %(a_id, p_id, step, code, contract, dir, str(vol), today)
         else: 
             cmd = 'INSERT INTO his_deals(account_id, policy_id, step, asset_id, contract_id, direction, vol, date)' \
-                    'VALUES ("%s", "%d", 0, "%s", "%s", "%s", "%s", "%s")' \
-                    %(a_id, p_id, code, contract, dir, str(vol), today)
+                    'VALUES ("%s", "%d", %d, "%s", "%s", "%s", "%s", "%s")' \
+                    %(a_id, p_id, step, code, contract, dir, str(vol), today)
         self.cur.execute(cmd)
         self.conn.commit()
         return
