@@ -1,5 +1,6 @@
 import yaml
 import time
+import json
 from db.sqlite import SqliteObj
 import datetime
 from datetime import datetime as d1
@@ -30,33 +31,42 @@ class VirtualCta:
             self.sqlite = SqliteObj(cta_conf["fund_db"])
 
         for policy in cta_conf["policy"]:
-            p = Policy(policy, self)
+            with open(policy, "r") as f:
+                line = f.read()
+                js = json.loads(line)
+            p = Policy(js, self)
             self.policy.append(p) 
 
-    def buy_asset(self, code, cash, charge):
+    def buy_asset(self, para):
         if self.type == "stock":
-            asset_num = int(cash / charge / 100) * 100 
-            money_num = cash - (asset_num * charge)
+            asset_num = int(para['buy_count'] / para['price']/ 100) * 100 
+            money_num = para['buy_count'] - (asset_num * para['price'])
         else :
-            asset_num = int(cash / charge * 1000) / 1000
+            asset_num = round(para['buy_count'] / para['price'],3)
             money_num = 0
         if asset_num != 0:
-            print("\033[31m[%s]:%s buy asset_num: %d charge:￥%s cash: %d \033[0m"%(self.date,code, asset_num, charge, cash-money_num))
-        return (asset_num, money_num)
+            print("\033[31m[%s]:%s buy asset_num: %s percent:%s charge:￥%s cash: %d \033[0m"% \
+            (self.date, para['code'], str(asset_num).center(8), str(para['percent']).center(6), str(para['price']).center(8), para['buy_count']-money_num))
+        para['policy'].cash_into = para['policy'].cash_into + para['buy_count'] - money_num
+        #para['policy'].asset_count = para['policy'].asset_count + asset_num
+        return (True, money_num, asset_num)
 
-    def sell_asset(self, code, asset_num, charge):
+    def update_policy_status(self, ids, cash_inuse, cash, asset_count, today):
+        pass
+
+    def sale_asset(self, para):
         if self.type == "stock":
-            sell_num = int(asset_num /100) * 100
+            sell_num = int(para['vol']/100) * 100
         else:
-            sell_num = asset_num
+            sell_num = para['vol']
 
-        money_num = round(sell_num * charge, 4)
+        money_num = round(sell_num * para['price'], 4)
 
-        asset_num = asset_num - sell_num
+        para['vol'] = para['vol'] - sell_num
         if money_num != 0:
-            print("\033[32m[%s]:%s sell stock_num: %d charge:￥%s cash: %d \033[0m"%(self.date,code, sell_num, charge, money_num))
+            print("\033[32m[%s]:%s sell stock_num: %d charge:￥%s cash: %d \033[0m"%(self.date,para['code'], sell_num, para['price'], money_num))
 
-        return (asset_num, money_num) 
+        return True
 
     def cta_run(self):
         self.date = self.start_time 
@@ -65,18 +75,18 @@ class VirtualCta:
         while(ts < ts_end):
             for code in self.assets:
                 if self.type == "stock":
-                    charge = self.sqlite.get_stock_history_charge_by_date(code, self.date)
+                    charge, percent = self.sqlite.get_stock_history_charge_by_date(code, self.date)
                 else:
-                    charge = self.sqlite.get_fund_history_charge_by_date(code, self.date)
+                    charge, percent = self.sqlite.get_fund_history_charge_by_date(code, self.date)
 
-                if charge is None:
+                if charge is None or percent is None:
                     continue
 
                 for p in self.policy:
                     if charge is None:
                         break
 
-                    p.execute(code, charge, 0.0)
+                    p.execute(code, charge, percent, self.date.replace("-",""))
 
             self.date = time_next_day(self.date)
             ts = time.strptime(self.date, "%Y-%m-%d")

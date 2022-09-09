@@ -44,7 +44,7 @@ def main(argv):
                 his = fund_http.fund_http_history_charge(cf["web_api"]["fund"], fcode[0])
                 fund_sq.insert_fund_history_charges(his, fcode=fcode[0])
                 js = fund_http.fund_http_real_time_charge(cf["web_api"]["fund"],fcode[0])
-                fund_sq.update_fund_real_time_charge(fcode[0], json.loads(js))
+                fund_sq.update_fund_real_time_charge(fcode[0], js)
 
             stocks = stock_sq.get_stock_self_selection()
             for stock in stocks:

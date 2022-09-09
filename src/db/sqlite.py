@@ -49,12 +49,12 @@ class SqliteObj:
 
     def get_fund_history_charge_by_date(self, scode, date):
         try:
-            cmd = 'SELECT dwjz FROM f%s WHERE fsrq == "%s"'%(scode, date) 
+            cmd = 'SELECT dwjz, jzzzl FROM f%s WHERE fsrq == "%s"'%(scode, date) 
             self.cur.execute(cmd)
             rows = self.cur.fetchall()
-            return rows[0][0]
+            return rows[0][0], rows[0][1]
         except:
-            return None
+            return None, None
 
 
 

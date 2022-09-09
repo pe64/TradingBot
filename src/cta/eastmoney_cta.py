@@ -1,4 +1,3 @@
-from os import PRIO_PROCESS
 import time
 import sys
 import datetime 
