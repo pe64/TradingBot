@@ -93,6 +93,7 @@ class Martin:
                 self.next_exe_charge = round(current_charge * (1 - self.percent),3)
                 self.cash = round(self.asset_count * float(current_charge),2) + self.cash
                 self.cash_inuse = self.cash_inuse - self.cash_into
+                self.cash_into = 0
                 self.asset_count = 0
                 if self.cash_inuse < 0:
                     self.cash_inuse = 0
@@ -115,7 +116,7 @@ class Martin:
         if self.asset_count == 0:
             self.deg_charge = 0
         else:
-            self.deg_charge = round(self.cash_into/self.asset_count, 2)
+            self.deg_charge = round(self.cash_into/self.asset_count, 4)
         
         pass
 
@@ -132,6 +133,6 @@ class Martin:
             "当前持仓数量": self.asset_count,
             "当前策略收益": str(int(self.current_earn_percent*10000) / 100) + "%",
             "当前持仓收益": str(int(self.current_asset_percent * 10000) / 100) + "%",
-            "持仓成本": str(int(self.deg_charge) * 100 / 100)
+            "持仓成本": str(self.deg_charge)
         }
         return dic
