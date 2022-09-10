@@ -51,7 +51,7 @@ class VirtualCta:
         #para['policy'].asset_count = para['policy'].asset_count + asset_num
         return (True, money_num, asset_num)
 
-    def update_policy_status(self, ids, cash_inuse, cash, asset_count, today):
+    def update_policy_status(self, ids, cash_inuse, cash, asset_count, today,price):
         pass
 
     def sale_asset(self, para):

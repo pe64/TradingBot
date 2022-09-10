@@ -1,12 +1,13 @@
 {
-    "id": "martin01",
+    "id": 2,
+    "account_id": 1,
     "type": "martin",
-    "asset_id": ["600276"],
-    "cash": 1000000,
-    "start_charge": null,
-    "percent": 0.01,
+    "asset_id": ["004753"],
+    "cash": 2500,
+    "price": 1.00,
+    "para":"{\"percent\":\"0.01\",\"buy_count\": \"10\",\"sale_percent\":\"0.2\"}",
+    "cash_into": 0.0,
+    "cash_inuse": 0.0,
     "asset_count": 0,
-    "asset_percent": null,
-    "buy_count": 10000,
-    "sell_percent": 0.05
+    "date":"19900909"
 }
