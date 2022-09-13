@@ -7,12 +7,12 @@ class Martin:
         self.asset_id = js["asset_id"]
         self.cash = float(js["cash"])
         self.asset_count = float(js["asset_count"])
-        self.next_exe_charge = float(js['price'])
         self.cash_inuse = float(js['cash_inuse'])
         self.cash_into = float(js['cash_into'])
 
         para = json.loads(js['para'])
         self.percent = float(para["percent"])
+        self.next_exe_charge = float(js['price']) * (1 - self.percent)
         #self.asset_percent = js['asset_percent']
         self.buy_count = float(para["buy_count"])
         self.sell_percent = float(para["sale_percent"])
@@ -70,7 +70,7 @@ class Martin:
                 self.asset_count = asset_num + self.asset_count
                 #self.current_into = self.current_into + self.buy_counts - money_num
                 self.cash_inuse = self.cash_inuse + self.buy_count - money_num
-                self.cta.update_policy_status(self.id, self.cash_inuse, self.cash, self.asset_count, date, self.next_exe_charge)
+                self.cta.update_policy_status(self.id, self.cash_inuse, self.cash, self.asset_count, date, current_charge)
         if self.cash_into > 0:
             self.current_asset_percent = round((self.asset_count*current_charge - self.cash_into) / self.cash_into, 3)
 
@@ -98,7 +98,7 @@ class Martin:
                 if self.cash_inuse < 0:
                     self.cash_inuse = 0
 
-                self.cta.update_policy_status(self.id, self.cash_inuse, self.cash, self.asset_count, date, self.next_exe_charge)
+                self.cta.update_policy_status(self.id, self.cash_inuse, self.cash, self.asset_count, date, current_charge)
             
 
         self.update_policy_status(current_charge)
@@ -125,8 +125,8 @@ class Martin:
             #"id": self.asset_ids,
             "策略类型": "马丁格尔策略",
             "当前总资产": round(self.current_amount, 2),
-            "总资产最高值": self.max_amount,
-            "总资产最低值": self.min_amount,
+            "总资产最高值": round(self.max_amount,2),
+            "总资产最低值": round(self.min_amount, 2),
             "剩余现金": int(self.cash * 100) / 100,
             "当前资产价值": self.current_asset_value,
             "策略总投入": int(self.cash_into * 100)/ 100,
