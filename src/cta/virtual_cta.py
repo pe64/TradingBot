@@ -62,11 +62,11 @@ class VirtualCta:
 
         money_num = round(sell_num * para['price'], 4)
 
-        para['vol'] = para['vol'] - sell_num
+        free_num = para['vol'] - sell_num
         if money_num != 0:
             print("\033[32m[%s]:%s sell stock_num: %d charge:￥%s cash: %d \033[0m"%(self.date,para['code'], sell_num, para['price'], money_num))
 
-        return True
+        return True, money_num, free_num
 
     def cta_run(self):
         self.date = self.start_time 

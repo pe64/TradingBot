@@ -26,7 +26,7 @@ class OpenPst:
         pass
     
     def check_buy_condition(self, percent, today, earn):
-        return int(self.date) < int(today) and \
+        return int(self.date)+self.period <= int(today) and \
                 percent < self.percent * 100 and \
                 earn <= self.pause * 100 and \
                 self.cash > self.buy_count
@@ -77,6 +77,7 @@ class OpenPst:
                 self.cash_into = 0
                 self.cash = round(self.asset_count * float(current_charge),2) + self.cash
                 self.asset_count = 0
+                self.date = today
                 self.cta.update_policy_status(self.id, self.cash_inuse, self.cash, self.asset_count, today, current_charge)
     
         self.update_policy_status(float(current_charge))

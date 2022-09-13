@@ -44,7 +44,11 @@ class EastMoneyCta:
                         self.em_sq.update_policy_asset_count(policy['id'], float(asset_count), float(cash_into))
                         self.em_sq.update_his_deals_step(contract['contract_id'], 2)
                         print("更新合约[%s]信息成功."%contract['contract_id'])
-
+                elif contract['direction'] == '112':
+                    p = self.get_policy_obj_by_id(policy['id'])
+                    if p is not None:
+                        #TODO:
+                        pass
 
     def init_policy(self, em):
         for policy in self.em_sq.get_account_policy(em.account_id):
@@ -211,9 +215,12 @@ class EastMoneyCta:
             asset = self.em_sq.get_asset_by_code(para['code'])
             contract = None
             if asset['type'] == "f" and self.check_fund_time():
+                vol = 0
+                cash = para['vol'] * para['price']
                 contract = self.sale_fund(em, para['code'], para['vol'], asset['market'])
             elif asset['type'] == "s" and self.check_stock_time():
-                contract = self.sale_stock(em, para['code'], para['vol'], asset['market'])
+                cash,vol = self.calc_asset(para['vol'], para['price'])
+                contract = self.sale_stock(em, para['code'], vol, asset['market'])
 
             if contract is None:
                 continue
@@ -227,7 +234,13 @@ class EastMoneyCta:
                 (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), em.get_user_id(),asset['code'], asset['name'], para['vol']))
             ret = True
 
-        return ret
+        return ret, cash, para['vol'] - vol
+    
+    def calc_asset(self, vol, price):
+        sell_num = int(vol/100) * 100
+        cash = sell_num * price
+
+        return cash, sell_num
     
     def calc_price(self, buy_count, price):
         vol = (buy_count/price/100)*100

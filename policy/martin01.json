@@ -5,7 +5,7 @@
     "asset_id": ["004753"],
     "cash": 2500,
     "price": 1.00,
-    "para":"{\"percent\":\"0.01\",\"buy_count\": \"10\",\"sale_percent\":\"0.2\"}",
+    "para":"{\"percent\":\"0.01\",\"buy_count\": \"10\",\"sale_percent\":\"0.2\",\"period\":1}",
     "cash_into": 0.0,
     "cash_inuse": 0.0,
     "asset_count": 0,

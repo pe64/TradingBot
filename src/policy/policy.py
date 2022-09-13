@@ -22,6 +22,7 @@ class Policy:
             self.policy = Balance(js, cta)
         elif js["type"] == "gerd":
             self.policy = Gerd(js, cta)
+            self.name = "平衡策略"
         elif js["type"] == "martin":
             self.policy = Martin(js, cta)
             self.name = "马丁策略"
