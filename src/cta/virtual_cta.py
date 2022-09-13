@@ -45,7 +45,7 @@ class VirtualCta:
             asset_num = round(para['buy_count'] / para['price'],3)
             money_num = 0
         if asset_num != 0:
-            print("\033[31m[%s]:%s buy asset_num: %s percent:%s charge:￥%s cash: %d \033[0m"% \
+            print("\033[31m[%s]:%s buy asset_num: %s percent:%s charge:￥%s cash: %s \033[0m"% \
             (self.date, para['code'], str(asset_num).center(8), str(para['percent']).center(6), str(para['price']).center(8), para['buy_count']-money_num))
         para['policy'].cash_into = para['policy'].cash_into + para['buy_count'] - money_num
         #para['policy'].asset_count = para['policy'].asset_count + asset_num
@@ -60,11 +60,12 @@ class VirtualCta:
         else:
             sell_num = para['vol']
 
-        money_num = round(sell_num * para['price'], 4)
+        money_num = round(sell_num * para['price'], 2)
 
         free_num = para['vol'] - sell_num
         if money_num != 0:
-            print("\033[32m[%s]:%s sell stock_num: %d charge:￥%s cash: %d \033[0m"%(self.date,para['code'], sell_num, para['price'], money_num))
+            print("\033[32m[%s]:%s sell stock_num: %s percent:%s charge:￥%s cash: %s \033[0m" % \
+            (self.date, para['code'], str(sell_num).center(7), str(para['percent']).center(6), str(para['price']).center(8), money_num))
 
         return True, money_num, free_num
 

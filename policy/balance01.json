@@ -8,5 +8,5 @@
     "cash_inuse":0,
     "cash_into":0,
     "date":19900909,
-    "para":"{\"percent\":0.5, \"act_percent\":0.05, \"period\":3}"
+    "para":"{\"percent\":0.5, \"act_percent\":0.01, \"period\":3}"
 }

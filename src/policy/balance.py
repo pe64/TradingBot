@@ -60,14 +60,19 @@ class Balance:
                 "account_id": self.account_id,
                 "code":code,
                 "asset_count":self.asset_count,
-                "vol":diff_charge/current_charge,
+                "vol":round(diff_charge/current_charge,2),
                 "price": current_charge,
+                "percent": percent
             }
             ret, money, asset = self.cta.sale_asset(para)
             if ret is True:
                 self.cash = round(para['vol'] * float(current_charge),2) + self.cash
-                self.cash_inuse = self.cash_inuse - self.cash_into
+                self.cash_inuse = self.cash_inuse - money
+                if self.cash_inuse < 0:
+                    self.cash_inuse = 0
                 self.cash_into = self.cash_into - money
+                if self.cash_into < 0:
+                    self.cash_into
                 self.asset_count = self.asset_count - para['vol'] + asset
                 self.date = int(today)
                 if self.cash_inuse < 0:
@@ -94,15 +99,7 @@ class Balance:
                 self.cta.update_policy_status(self.id, self.cash_inuse, self.cash, self.asset_count, today, current_charge)
             pass
         self.update_policy_status(current_charge)
-        #id = self.asset_ids.index(code)
-        #self.balance_asset_price[id] = current_charge
-        #self.current_asset_value[id] = int(self.asset_count[id] * current_charge)*100/100
-        #if 0 not in self.balance_asset_price:
-        #    self.balance_asset(id, current_charge)
-        #    self.current_earn_percent = (self.current_amount - self.start_amount) / self.start_amount
 
-        #self.max_amount = max(self.max_amount, self.current_amount)
-        #self.min_amount = min(self.min_amount, self.current_amount)
     def update_policy_status(self, current_charge):
         self.current_amount = round(self.asset_count * current_charge, 2) + self.cash
         self.max_amount = round(max(self.max_amount, self.current_amount),2)
@@ -131,6 +128,6 @@ class Balance:
             "当前持仓数量": self.asset_count,
             "当前策略收益": str(int(self.current_earn_percent*10000) / 100) + "%",
             "当前持仓收益": str(int(self.current_asset_percent * 10000) / 100) + "%",
-            #"持仓成本": str(int(self.deg_charge) * 100 / 100)
+            "持仓成本": str(int(self.deg_charge) * 100 / 100)
         }
         return dic    
