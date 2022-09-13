@@ -90,6 +90,7 @@ class EastMoneyCta:
                 self.init_flag = 1
             
             if self.check_policy_update_time():
+                self.update_account_status(em)
                 self.update_policy(em)
             
             if self.check_new_submit_new_asset_time():
