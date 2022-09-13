@@ -39,6 +39,8 @@ class HttpEM:
         self.get_fund_his_deals_conf = cf['eastmoney']['get_fund_his_deals']
         self.real_charge_conf = cf['eastmoney']['stock_real_charge']
         self.deal_data_conf = cf['eastmoney']['stock_deal_data']
+        self.get_can_buy_new_stock_conf = cf['eastmoney']['get_can_buy_new_stock']
+        self.get_bond_list_conf = cf['eastmoney']['get_bond_list']
         self.validatekey = ""
         self.random = str(random.random())
         #with open(self.login_conf['arguments'], "r") as f:
@@ -370,4 +372,19 @@ class HttpEM:
         
         return None
 
+    def get_can_buy_new_stock(self):
+        url = self.get_can_buy_new_stock_conf['url'] + self.validatekey
+        headers = self.build_headers(self.get_can_buy_new_stock_conf['headers'])
+        data = {}
 
+        js = self.http_post(url, data, headers)
+        return js
+
+    def get_bond_list(self):
+        url = self.get_bond_list_conf['url'] + self.validatekey
+        headers = self.build_headers(self.get_bond_list_conf['headers'])
+        data = {}
+
+        js = self.http_post(url, data, headers)
+
+        return js

@@ -15,6 +15,21 @@ logging:
   level: "info"
   date_format: "%m-%d-%Y %H:%M:%S %p"
 
+period:
+  trading_fund:
+    start: "14:40"
+    end: "14:55"
+  check_fund:
+    start: "19:35"
+    end: "19:50"
+  trading_stock:
+    start1: "09:35"
+    end1: "11:29"
+    start2: "13:05"
+    end2: "14:57"
+  new_asset:
+    start: "11:00"
+    end: "11:30"
 
 web_api:
   fund:
@@ -419,5 +434,27 @@ eastmoney:
       'Origin: https://jywg.18.cn',
       'Pragma: no-cache',
       'Referer: https://jywg.18.cn/Search/Deal',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+  get_can_buy_new_stock:
+    url: "https://jywg.18.cn/Trade/GetCanBuyNewStockListV3?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Length: 0',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/Trade/NewBatBuy',
+      'X-Requested-With: XMLHttpRequest' ,
+    ]
+  get_bond_list:
+    url: "https://jywg.18.cn/Trade/GetConvertibleBondListV2?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Length: 0',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/Trade/XzsgBatPurchase',
       'X-Requested-With: XMLHttpRequest',
     ]

@@ -70,8 +70,8 @@ class EastMoneyCta:
         pass
 
     def check_policy_update_time(self):
-        st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "19:30", '%Y-%m-%d%H:%M')
-        et = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "19:35", '%Y-%m-%d%H:%M')
+        st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['check_fund']['start'], '%Y-%m-%d%H:%M')
+        et = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['check_fund']['end'], '%Y-%m-%d%H:%M')
         now_time = datetime.datetime.now()
 
         return now_time > st and now_time < et
@@ -91,6 +91,22 @@ class EastMoneyCta:
             
             if self.check_policy_update_time():
                 self.update_policy(em)
+            
+            if self.check_new_submit_new_asset_time():
+                self.submit_new_asset(em)
+
+    def check_new_submit_new_asset_time(self):
+        st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['new_asset']['start'], '%Y-%m-%d%H:%M')
+        et = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['new_asset']['end'], '%Y-%m-%d%H:%M')
+        now_time = datetime.datetime.now()
+
+        return now_time > st and now_time < et
+
+    def submit_new_asset(self, em):
+        ret = em.get_can_buy_new_stock()
+        ret = em.get_bond_list()
+
+        return ret
 
     def update_account_status(self, em):
         r_dic = {}
@@ -142,17 +158,17 @@ class EastMoneyCta:
         return em.fund_submit_trade(code, vol, "sale")
 
     def check_stock_time(self):
-        st1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "09:35", '%Y-%m-%d%H:%M')
-        et1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "11:25", '%Y-%m-%d%H:%M')
-        st2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "13:02", '%Y-%m-%d%H:%M')
-        et2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "14:55", '%Y-%m-%d%H:%M')
+        st1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['trading_stock']['start1'], '%Y-%m-%d%H:%M')
+        et1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['trading_stock']['end1'], '%Y-%m-%d%H:%M')
+        st2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['trading_stock']['start2'], '%Y-%m-%d%H:%M')
+        et2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['trading_stock']['end2'], '%Y-%m-%d%H:%M')
         now_time = datetime.datetime.now()
 
         return (now_time > st1 and now_time < et1) or (now_time > st2 and now_time < et2)
 
     def check_fund_time(self):
-        st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "14:40", '%Y-%m-%d%H:%M')
-        et = datetime.datetime.strptime(str(datetime.datetime.now().date()) + "14:59", '%Y-%m-%d%H:%M')
+        st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['trading_fund']['start'], '%Y-%m-%d%H:%M')
+        et = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['trading_fund']['end'], '%Y-%m-%d%H:%M')
         now_time = datetime.datetime.now()
 
         return now_time > st and now_time < et
