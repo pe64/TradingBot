@@ -60,7 +60,7 @@ class EastMoneyCta:
             policy['asset_id'] = asset['code']
             p = Policy(policy, self) 
             self.policy.append(p)
-            print("账户:%s 策略:%s 剩余现金:%s元 已投入金额:%s元 目标资产:%s."%(em.get_user_id(), p.name, policy['cash'].center(8), policy['cash_inuse'].center(8), asset['name']))
+            print("\033[34m账户:%s 策略:%s 剩余现金:%s元 已投入金额:%s元 目标资产:%s.\033[0m"%(em.get_user_id(), p.name, policy['cash'].center(8), policy['cash_inuse'].center(8), asset['name']))
         pass
 
     def check_policy_update_time(self):
