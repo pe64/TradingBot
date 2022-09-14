@@ -469,3 +469,14 @@ eastmoney:
       'Referer: https://jywg.18.cn/Trade/NewBatBuy',
       'X-Requested-With: XMLHttpRequest',
     ]
+  get_asset:
+    url: "https://jywg.18.cn/Com/GetAssets?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Length: 0',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/FundTrade/Purchase',
+      'X-Requested-With: XMLHttpRequest',
+    ]

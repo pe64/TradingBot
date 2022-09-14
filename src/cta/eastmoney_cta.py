@@ -77,7 +77,10 @@ class EastMoneyCta:
                 em.login_em_platform()
 
             if self.init_flag < len(self.em):
-                print("账户:%s 登陆成功。"%(em.get_user_id()))
+                print("账户:%s 登陆成功"%(em.get_user_id()),end="|")
+                ret = em.get_asset()
+                for node in ret:
+                    print("总资产:%s元,可用金额:%s元,持仓盈亏:%s元."%(node['Zzc'],node['Kyzj'],node['Ljyk'])) 
                 self.update_account_status(em)
                 self.init_policy(em)
                 self.update_policy(em)

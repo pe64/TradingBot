@@ -42,6 +42,7 @@ class HttpEM:
         self.get_can_buy_new_stock_conf = cf['eastmoney']['get_can_buy_new_stock']
         self.get_bond_list_conf = cf['eastmoney']['get_bond_list']
         self.submit_bat_trade_conf = cf['eastmoney']['submit_bat_trade']
+        self.get_asset_conf = cf['eastmoney']['get_asset']
         self.validatekey = ""
         self.random = str(random.random())
         #with open(self.login_conf['arguments'], "r") as f:
@@ -403,3 +404,15 @@ class HttpEM:
         data = json.dumps(para).encode(encoding='utf-8')
         js = self.http_post(url,data,headers,raw=True)
         return js
+    
+    def get_asset(self):
+        url = self.get_asset_conf['url'] + self.validatekey
+        headers = self.build_headers(self.get_asset_conf['headers'])
+        data = {}
+        js = self.http_post(url, data, headers)
+
+        if js["Status"] == 0:
+            return js['Data']
+        else:
+            print("get asset errror %s", js["Message"])
+            return []
