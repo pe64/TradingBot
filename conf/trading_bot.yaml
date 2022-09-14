@@ -458,3 +458,14 @@ eastmoney:
       'Referer: https://jywg.18.cn/Trade/XzsgBatPurchase',
       'X-Requested-With: XMLHttpRequest',
     ]
+  
+  submit_bat_trade:
+    url: "https://jywg.18.cn/Trade/SubmitBatTradeV2?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/json',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/Trade/NewBatBuy',
+      'X-Requested-With: XMLHttpRequest',
+    ]
