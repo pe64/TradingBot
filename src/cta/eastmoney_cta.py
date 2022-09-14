@@ -40,9 +40,9 @@ class EastMoneyCta:
                 if contract['direction'] == "111":
                     p = self.get_policy_obj_by_id(policy['id'])
                     if p is not None:
-                        asset_count = p.add_asset_count(contract['vol'])
-                        cash_into = p.add_cash_into(contract['cash'])
-                        self.em_sq.update_policy_asset_count(policy['id'], float(asset_count), float(cash_into))
+                        asset_count = p.add_asset_count(float(contract['vol']))
+                        cash_into = p.add_cash_into(float(contract['cash']))
+                        self.em_sq.update_policy_asset_count(policy['id'], round(asset_count,2), round(cash_into, 2))
                         self.em_sq.update_his_deals_step(contract['contract_id'], 2)
                         print("更新合约[%s]信息成功."%contract['contract_id'])
                 elif contract['direction'] == '112':
