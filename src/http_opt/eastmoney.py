@@ -41,6 +41,7 @@ class HttpEM:
         self.deal_data_conf = cf['eastmoney']['stock_deal_data']
         self.get_can_buy_new_stock_conf = cf['eastmoney']['get_can_buy_new_stock']
         self.get_bond_list_conf = cf['eastmoney']['get_bond_list']
+        self.submit_bat_trade_conf = cf['eastmoney']['submit_bat_trade']
         self.validatekey = ""
         self.random = str(random.random())
         #with open(self.login_conf['arguments'], "r") as f:
@@ -84,8 +85,11 @@ class HttpEM:
         #    time.sleep(120)
 
 
-    def http_post(self, url, arg, headers):
-        data = parse.urlencode(arg).encode('utf-8')
+    def http_post(self, url, arg, headers, raw=False):
+        if raw == False:
+            data = parse.urlencode(arg).encode('utf-8')
+        else:
+            data = arg
         req = request.Request(url, method="POST",data=data, headers=headers)
         resp = self.opener.open(req)
         ret = resp.read().decode('utf-8')
@@ -386,5 +390,16 @@ class HttpEM:
         data = {}
 
         js = self.http_post(url, data, headers)
+        if js['Status'] == 0:
+            return js['Data']
+        else:
+            print("get bond list error:%s", js['Message'])
+            return []
 
+    
+    def submit_bat_trade(self, para):
+        url = self.submit_bat_trade_conf['url'] + self.validatekey
+        headers = self.build_headers(self.submit_bat_trade_conf['headers'])
+        data = json.dumps(para).encode(encoding='utf-8')
+        js = self.http_post(url,data,headers,raw=True)
         return js

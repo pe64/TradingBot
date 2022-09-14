@@ -102,10 +102,49 @@ class EastMoneyCta:
         now_time = datetime.datetime.now()
 
         return now_time > st and now_time < et
+        #return True
 
     def submit_new_asset(self, em):
+        stock = []
+        bond = []
+
         ret = em.get_can_buy_new_stock()
+        for node in ret['NewStockList']:
+            if int(node['Ksgsx']) > 0:
+                p = {
+                    "StockCode":node['Sgdm'],
+                    "StockName":node['Zqmc'],
+                    "Price":node['Fxj'],
+                    "Amount":node['Ksgsx'],
+                    "TradeType":"B",
+                    "Market":node['Market']
+                }
+                stock.append(p)
+
+        if len(stock) > 0:
+            js = em.submit_bat_trade(stock)
+            print("新股申购:",js['Message'])
+        else:
+            print("今日无新股可申购.")
+
         ret = em.get_bond_list()
+        for node in ret:
+            if node['ExIsToday'] is True:
+                b = {
+                   "StockCode": node['SUBCODE'],
+                   "StockName": node['SUBNAME'],
+                   "Price": node['PARVALUE'],
+                   "Amount": node['LIMITBUYVOL'],
+                   "TradeType":"B",
+                   "Market": node['Market']
+                }
+                bond.append(b)
+
+        if len(bond) > 0:
+            js = em.submit_bat_trade(bond)
+            print("新债申购:", js["Message"])
+        else:
+            print("今日无新债可申购.")
 
         return ret
 
