@@ -54,13 +54,6 @@ class EastMoneyCta:
     def init_policy(self, em):
         for policy in self.em_sq.get_account_policy(em.account_id):
             asset = self.em_sq.get_asset_by_id(policy['asset_id'])
-            #contracts = self.em_sq.get_his_deals_by_step_and_policy(1, em.account_id, policy['id'], asset['code'])
-            #for contract in contracts:
-            #    if contract['direction'] == "111":
-            #        policy['asset_count'] = float(policy['asset_count']) + float(contract['vol'])
-            #        policy['cash_into'] = float(policy['cash_into']) + float(contract['cash'])
-            #        self.em_sq.update_policy_asset_count(policy['id'], policy['asset_count'], float(policy['cash_into']))
-            #        self.em_sq.update_his_deals_step(contract['contract_id'], 2)
 
             if len(asset) == 0:
                 continue
