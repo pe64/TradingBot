@@ -22,6 +22,7 @@ class EastMoneyCta:
         self.policy = []
         self.today = time.strftime("%Y%m%d", time.localtime())
         self.init_flag = 0
+        self.new_asset_flag = False
         pass
 
     def get_policy_obj_by_id(self, pid):
@@ -93,8 +94,9 @@ class EastMoneyCta:
                 self.update_account_status(em)
                 self.update_policy(em)
             
-            if self.check_new_submit_new_asset_time():
+            if self.check_new_submit_new_asset_time() and self.new_asset_flag is False:
                 self.submit_new_asset(em)
+                self.new_asset_flag = True
 
     def check_new_submit_new_asset_time(self):
         st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['new_asset']['start'], '%Y-%m-%d%H:%M')
