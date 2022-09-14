@@ -22,7 +22,7 @@ class EastMoneyCta:
         self.policy = []
         self.today = time.strftime("%Y%m%d", time.localtime())
         self.init_flag = 0
-        self.new_asset_flag = False
+        self.new_asset_flag = 0
         pass
 
     def get_policy_obj_by_id(self, pid):
@@ -76,21 +76,21 @@ class EastMoneyCta:
                 em.login_em_ver_code()
                 em.login_em_platform()
 
-            if self.init_flag == 0:
+            if self.init_flag < len(self.em):
                 print("账户:%s 登陆成功。"%(em.get_user_id()))
                 self.update_account_status(em)
                 self.init_policy(em)
                 self.update_policy(em)
+                self.init_flag = self.init_flag + 1
             
             if self.check_policy_update_time():
                 self.update_account_status(em)
                 self.update_policy(em)
             
-            if self.check_new_submit_new_asset_time() and self.new_asset_flag is False:
+            if self.check_new_submit_new_asset_time() and self.new_asset_flag < len(self.em):
                 self.submit_new_asset(em)
-                self.new_asset_flag = True
+                self.new_asset_flag = self.new_asset_flag + 1
 
-        self.init_flag = 1
 
     def check_new_submit_new_asset_time(self):
         st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['new_asset']['start'], '%Y-%m-%d%H:%M')
