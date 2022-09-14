@@ -88,7 +88,6 @@ class EastMoneyCta:
                 self.update_account_status(em)
                 self.init_policy(em)
                 self.update_policy(em)
-                self.init_flag = 1
             
             if self.check_policy_update_time():
                 self.update_account_status(em)
@@ -97,6 +96,8 @@ class EastMoneyCta:
             if self.check_new_submit_new_asset_time() and self.new_asset_flag is False:
                 self.submit_new_asset(em)
                 self.new_asset_flag = True
+
+        self.init_flag = 1
 
     def check_new_submit_new_asset_time(self):
         st = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['new_asset']['start'], '%Y-%m-%d%H:%M')
