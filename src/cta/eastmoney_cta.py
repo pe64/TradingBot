@@ -102,7 +102,6 @@ class EastMoneyCta:
         now_time = datetime.datetime.now()
 
         return now_time > st and now_time < et
-        #return True
 
     def submit_new_asset(self, em):
         stock = []
