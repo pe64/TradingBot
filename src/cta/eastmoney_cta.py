@@ -44,7 +44,7 @@ class EastMoneyCta:
                         cash_into = p.add_cash_into(float(contract['cash']))
                         self.em_sq.update_policy_asset_count(policy['id'], round(asset_count,2), round(cash_into, 2))
                         self.em_sq.update_his_deals_step(contract['contract_id'], 2)
-                        print("更新合约[%s]信息成功."%contract['contract_id'])
+                        print("\033[36m更新合约[%s]信息成功.\033[0m"%contract['contract_id'])
                 elif contract['direction'] == '112':
                     p = self.get_policy_obj_by_id(policy['id'])
                     if p is not None:
@@ -182,7 +182,7 @@ class EastMoneyCta:
                 for p in self.policy:
                     p.execute(stock['code'], float(ret['currentPrice']), float(ret['zdf']), self.today)
         
-        print(".", end="")
+        #print(".", end="")
         sys.stdout.flush()
 
     def buy_fund(self, em, code, vol):

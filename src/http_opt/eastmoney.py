@@ -112,6 +112,7 @@ class HttpEM:
         if js["Status"] == 0:
             print("login success %s."%str(datetime.datetime.now()))
             self.cookie.save(filename=self.cookie_path,ignore_discard=True, ignore_expires=True)
+            os.rename(self.ver_conf["file"], str(self.ver_conf['file']).replace("em", self.login_js['identifyCode']))
         else:
             print("login error.")
         pass
