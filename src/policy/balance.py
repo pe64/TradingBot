@@ -66,7 +66,7 @@ class Balance:
             }
             ret, money, asset = self.cta.sale_asset(para)
             if ret is True:
-                self.cash = round(para['vol'] * float(current_charge),2) + self.cash
+                self.cash = money + self.cash
                 self.cash_inuse = self.cash_inuse - money
                 if self.cash_inuse < 0:
                     self.cash_inuse = 0

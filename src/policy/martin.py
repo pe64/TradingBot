@@ -55,7 +55,7 @@ class Martin:
         #if self.start_charge is None:
         #    self.asset_init(code, current_charge)
         
-        if float(current_charge) < self.next_exe_charge or self.cash > self.buy_count:
+        if float(current_charge) < self.next_exe_charge and self.cash > self.buy_count:
             para = {
                 "policy_id": self.id,
                 "account_id": self.account_id,
@@ -74,12 +74,9 @@ class Martin:
                 self.cash_inuse = self.cash_inuse + self.buy_count - money_num
                 self.date = int(date)
                 self.cta.update_policy_status(self.id, self.cash_inuse, self.cash, self.asset_count, date, current_charge)
+
         if self.cash_into > 0:
             self.current_asset_percent = round((self.asset_count*current_charge - self.cash_into) / self.cash_into, 3)
-
-        #if self.asset_count == 0 :
-        #    if current_charge * (1 - self.percent) > self.next_exe_charge:
-        #        self.next_exe_charge = round(current_charge * (1 - self.percent), 3)
 
         if self.sell_percent < self.current_asset_percent and self.asset_count != 0:
             para ={
@@ -94,11 +91,13 @@ class Martin:
             ret, money, asset = self.cta.sale_asset(para)
             if ret is True:
                 self.next_exe_charge = round(current_charge * (1 - self.percent),3)
-                self.cash = round(self.asset_count-asset * float(current_charge),2) + self.cash
-                self.cash_inuse = self.cash_inuse - self.cash_into
+                self.cash = money + self.cash
+                self.cash_inuse = self.cash_inuse - money
                 self.cash_into = self.cash_into - money
                 if self.cash_into < 0:
                     self.cash_into = 0
+                if self.cash_inuse < 0:
+                    self.cash_inuse = 0
                 
                 self.asset_count = asset
                 self.date = int(date)

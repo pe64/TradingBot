@@ -80,7 +80,13 @@ class EastMoneyCta:
                 print("\033[33m账户:%s 登陆成功\033[0m"%(em.get_user_id()),end="|")
                 ret = em.get_asset()
                 for node in ret:
-                    print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:%s元.\033[0m"%(node['Zzc'],node['Kyzj'],node['Ljyk'])) 
+                    if node['Ljyk'] is None:
+                        print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:0元.\033[0m"%(node['Zzc'],node['Kyzj'])) 
+                    elif float(node['Ljyk']) > 0:
+                        print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:\033[32m%s\033[33m元.\033[0m"%(node['Zzc'],node['Kyzj'],node['Ljyk'])) 
+                    elif  float(node['Ljyk']) < 0:
+                        print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:\033[31m%s\033[33m元.\033[0m"%(node['Zzc'],node['Kyzj'],node['Ljyk'])) 
+
                 self.update_account_status(em)
                 self.init_policy(em)
                 self.update_policy(em)
@@ -211,11 +217,11 @@ class EastMoneyCta:
 
         return now_time > st and now_time < et
 
-    def check_order_success(em, order):
+    def check_order_success(self, em, order):
         flags = True
         ret = True
         for times in range(1,3):
-            contracts = em.stock_get_revokes()
+            contracts = em.get_deal_data()
             if order not in contracts:
                 flags = False
                 break
@@ -274,9 +280,11 @@ class EastMoneyCta:
                 contract = self.sale_fund(em, para['code'], para['vol'], asset['market'])
             elif asset['type'] == "s" and self.check_stock_time():
                 cash,vol = self.calc_asset(para['vol'], para['price'])
-                contract = self.sale_stock(em, para['code'], vol, asset['market'])
+                ret, contract = self.sale_stock(em, para['code'], para['price'], vol)
 
             if contract is None:
+                cash = 0
+                vol = 0
                 continue
             
             if asset['type'] == "f":
@@ -292,7 +300,7 @@ class EastMoneyCta:
     
     def calc_asset(self, vol, price):
         sell_num = int(vol/100) * 100
-        cash = sell_num * price
+        cash = round(sell_num * price, 2)
 
         return cash, sell_num
     
