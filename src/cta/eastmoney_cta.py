@@ -201,19 +201,20 @@ class EastMoneyCta:
                 for p in self.policy:
                     p.execute(stock['code'], float(ret['currentPrice']), float(ret['zdf']), self.today)
         bond_dic = {}
-        for em in self.em:
-            bonds = em.get_bond_code()
-            for bond in bonds:
-                days = em.get_bond_days(bond['Zqdm'], bond['Market'])
-                ret, price, zdf = em.get_bond_yield(bond['Zqdm'])
-                if price - self.ttb_yield > self.gconf['eastmoney']['bond']['diff'] or zdf > self.gconf['eastmoney']['bond']['zdf']:
-                    #print("国债[%s] 占用天数: %s, 年化收益率: %s %%"%(bond["Zqdm"], days, price))
-                    bond_dic[bond["Zqdm"]] = {
-                        "days": days,
-                        "zdf": zdf,
-                        "price": price
-                        }
-                pass
+        if self.check_stock_time():
+            for em in self.em:
+                bonds = em.get_bond_code()
+                for bond in bonds:
+                    days = em.get_bond_days(bond['Zqdm'], bond['Market'])
+                    ret, price, zdf = em.get_bond_yield(bond['Zqdm'])
+                    if price - self.ttb_yield > self.gconf['eastmoney']['bond']['diff'] or zdf > self.gconf['eastmoney']['bond']['zdf']:
+                        #print("国债[%s] 占用天数: %s, 年化收益率: %s %%"%(bond["Zqdm"], days, price))
+                        bond_dic[bond["Zqdm"]] = {
+                            "days": days,
+                            "zdf": zdf,
+                            "price": price
+                            }
+                    pass
         
         for key in bond_dic:
             print("国债[%s] 占用天数: %s, 年化收益率: %s %%"%(key, bond_dic[key]['days'], bond_dic[key]['price']))
