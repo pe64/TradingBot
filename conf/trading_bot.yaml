@@ -246,6 +246,9 @@ fund51:
     ]
 
 eastmoney:
+  bond:
+    diff: 0.3
+    zdf: 5
   cookie: "cache/emcookie" 
   headers_comm: [
     'Accept-Language: zh-CN,zh;q=0.9',
@@ -479,4 +482,61 @@ eastmoney:
       'Pragma: no-cache',
       'Referer: https://jywg.18.cn/FundTrade/Purchase',
       'X-Requested-With: XMLHttpRequest',
+    ]
+  
+  get_ttb_code:
+    url: "https://jywg.18.cn/Finance/TTB/TTBIndex"
+    headers: [
+      'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9' ,
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/BondRepurchase/SecuritiesLendingRepurchase',
+      'Sec-Fetch-Dest: document',
+      'Sec-Fetch-Mode: navigate',
+      'Sec-Fetch-Site: same-origin',
+      'Sec-Fetch-User: ?1',
+      'Upgrade-Insecure-Requests: 1'
+    ]
+  
+  get_ttb_yield:
+    url: "https://jywg.18.cn/Finance/TTB/GetTtbProfitInfo?v="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/Finance/TTB/TTBIndex',
+      'X-Requested-With: XMLHttpRequest' ,
+    ]
+  
+  get_bond_code:
+    url: "https://jywg.18.cn/BondRepurchase/GetAvaliableStocks?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Length: 0',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/BondRepurchase/SecuritiesLendingRepurchase',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+  
+  get_bond_days:
+    url: "https://jywg.18.cn/BondRepurchase/GetActualOccupiedDays?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/BondRepurchase/SecuritiesLendingRepurchase',
+      'X-Requested-With: XMLHttpRequest',
+    ]
+
+  get_bond_yield:
+    url: "https://hsmarketwg.eastmoney.com/api/SHSZQuoteSnapshot?callback=jQuery1830550326405927082_"
+    headers: [
+      'Accept: */*',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/',
+      'Sec-Fetch-Dest: script',
+      'Sec-Fetch-Mode: no-cors',
+      'Sec-Fetch-Site: cross-site',
     ]

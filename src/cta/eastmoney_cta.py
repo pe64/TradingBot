@@ -23,6 +23,7 @@ class EastMoneyCta:
         self.today = time.strftime("%Y%m%d", time.localtime())
         self.init_flag = 0
         self.new_asset_flag = 0
+        self.ttb_yield = 0
         pass
 
     def get_policy_obj_by_id(self, pid):
@@ -69,6 +70,14 @@ class EastMoneyCta:
         now_time = datetime.datetime.now()
 
         return now_time > st and now_time < et
+    
+    def get_ttb_yield(self,em):
+        ret, dm, gs = em.get_ttb_code()
+        if ret is True:
+            ttb_yield = em.get_ttb_yield(dm, gs)
+            return float(ttb_yield)
+        else:
+            return None
 
     def login(self):
         for em in self.em:
@@ -79,6 +88,9 @@ class EastMoneyCta:
             if self.init_flag < len(self.em):
                 print("\033[33m账户:%s 登陆成功\033[0m"%(em.get_user_id()),end="|")
                 ret = em.get_asset()
+                ttb_yield = self.get_ttb_yield(em)
+                print("\033[33m 货币基金收益率 %s %%\033[0m"%(ttb_yield),end="|")
+                self.ttb_yield = max(self.ttb_yield, ttb_yield)
                 for node in ret:
                     if node['Ljyk'] is None:
                         print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:0元.\033[0m"%(node['Zzc'],node['Kyzj'])) 
@@ -99,6 +111,7 @@ class EastMoneyCta:
             if self.check_new_submit_new_asset_time() and self.new_asset_flag < len(self.em):
                 self.submit_new_asset(em)
                 self.new_asset_flag = self.new_asset_flag + 1
+            
 
 
     def check_new_submit_new_asset_time(self):
@@ -187,7 +200,23 @@ class EastMoneyCta:
             if ret is not None:
                 for p in self.policy:
                     p.execute(stock['code'], float(ret['currentPrice']), float(ret['zdf']), self.today)
+        bond_dic = {}
+        for em in self.em:
+            bonds = em.get_bond_code()
+            for bond in bonds:
+                days = em.get_bond_days(bond['Zqdm'], bond['Market'])
+                ret, price, zdf = em.get_bond_yield(bond['Zqdm'])
+                if price - self.ttb_yield > self.gconf['eastmoney']['bond']['diff'] or zdf > self.gconf['eastmoney']['bond']['zdf']:
+                    #print("国债[%s] 占用天数: %s, 年化收益率: %s %%"%(bond["Zqdm"], days, price))
+                    bond_dic[bond["Zqdm"]] = {
+                        "days": days,
+                        "zdf": zdf,
+                        "price": price
+                        }
+                pass
         
+        for key in bond_dic:
+            print("国债[%s] 占用天数: %s, 年化收益率: %s %%"%(key, bond_dic[key]['days'], bond_dic[key]['price']))
         #print(".", end="")
         sys.stdout.flush()
 

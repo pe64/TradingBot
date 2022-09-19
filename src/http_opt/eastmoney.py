@@ -43,6 +43,12 @@ class HttpEM:
         self.get_bond_list_conf = cf['eastmoney']['get_bond_list']
         self.submit_bat_trade_conf = cf['eastmoney']['submit_bat_trade']
         self.get_asset_conf = cf['eastmoney']['get_asset']
+        self.ttb_code_conf = cf['eastmoney']['get_ttb_code']
+        self.ttb_yield_conf = cf['eastmoney']['get_ttb_yield']
+        self.bond_code_conf = cf['eastmoney']['get_bond_code']
+        self.bond_days_conf = cf['eastmoney']['get_bond_days']
+        self.bond_yield_conf = cf['eastmoney']['get_bond_yield']
+        self.ttb_yield = 0
         self.validatekey = ""
         self.random = str(random.random())
         #with open(self.login_conf['arguments'], "r") as f:
@@ -417,3 +423,75 @@ class HttpEM:
         else:
             print("get asset errror %s", js["Message"])
             return []
+
+    def get_ttb_code(self):
+        url = self.ttb_code_conf['url']
+        headers = self.build_headers(self.ttb_code_conf['headers'])
+        req = request.Request(url, headers=headers)
+        resp = self.opener.open(req)
+        text = resp.read().decode('utf-8')
+        id = text.find("jjdm:")
+        
+        if id == -1:
+            print("get ttb code error.")
+            return False, None, None
+        else:
+            jjdm = text[id+7: id + 13]
+            id = text.find("jjgs:")
+            jjgs = text[id+7: id+9]
+            return True, jjdm, jjgs
+
+    def get_ttb_yield(self, jjdm, jjgs):
+        url = self.ttb_yield_conf['url'] + get_time_strl() + "&jjgs=" + jjgs + "&jjdm=" + jjdm
+        headers = self.build_headers(self.ttb_yield_conf['headers'])
+        req = request.Request(url, headers=headers) 
+        resp = self.opener.open(req)
+        text = resp.read().decode('utf-8')
+        js = json.loads(text)
+        if js["Status"] == 0:
+            self.ttb_yield = js["Data"][0]["Qrnhsy"]
+            return self.ttb_yield
+        else:
+            print("get ttb yield error %s",js['Message'])
+            return None
+
+    def get_bond_code(self):
+        url = self.bond_code_conf['url']
+        headers = self.build_headers(self.bond_code_conf['headers'])
+        data = {}
+
+        js = self.http_post(url, data, headers)
+        if js["Status"] == 0:
+            return js["Data"]
+        else:
+            print("get bond code error %s" % js['Message'])
+            return []
+
+    def get_bond_days(self, code, market):
+        url = self.bond_days_conf['url'] + self.validatekey
+        headers = self.build_headers(self.bond_days_conf['headers'])
+
+        data = {
+            "zqdm": code,
+            "market": market
+        }
+        js = self.http_post(url, data, headers)
+        if js["Status"] == 0:
+            return int(js["Data"][0]["Jxdays"])
+        else:
+            return None
+
+    def get_bond_yield(self, code):
+        url = self.bond_yield_conf['url'] + get_time_strl() + "&id=" +code + "&dm=" + get_time_strl() + "&_=" + get_time_strl()
+        headers = self.build_headers(self.bond_yield_conf['headers'])
+
+        req = request.Request(url, headers=headers) 
+        resp = self.opener.open(req)
+        text = resp.read().decode('utf-8')
+        id = text.find("{")
+        if id != -1:
+            js = json.loads(text[id:-2])
+            return True, float(js['realtimequote']["currentPrice"]), float(js["realtimequote"]['zdf'][:-1])
+        else:
+            return False, None, None
+        pass
