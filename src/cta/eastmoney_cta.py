@@ -207,9 +207,10 @@ class EastMoneyCta:
                 for bond in bonds:
                     days = em.get_bond_days(bond['Zqdm'], bond['Market'])
                     ret, price, zdf = em.get_bond_yield(bond['Zqdm'])
-                    if price - self.ttb_yield > self.gconf['eastmoney']['bond']['diff'] or zdf > self.gconf['eastmoney']['bond']['zdf']:
-                        #print("国债[%s] 占用天数: %s, 年化收益率: %s %%"%(bond["Zqdm"], days, price))
+                    if price - self.ttb_yield > self.gconf['eastmoney']['bond']['diff']:
+
                         if bond_dic.get(days) is not None:
+
                             if bond_dic[days]["price"] > price:
                                 continue
                             else:
@@ -219,6 +220,7 @@ class EastMoneyCta:
                                     "zdf": zdf,
                                     "price": price
                                     }
+
                         else:
                             bond_dic[days] = {
                                 "code": bond['Zqdm'],
@@ -228,7 +230,7 @@ class EastMoneyCta:
                             }
         
         for key in bond_dic:
-            print("国债[%s] 占用天数: %s, 年化收益率: %s %%"%(bond_dic[key]["code"], bond_dic[key]['days'], bond_dic[key]['price']))
+            print("%s 国债[%s] 占用天数: %s, 年化收益率: %s %%"%(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),bond_dic[key]["code"], bond_dic[key]['days'], bond_dic[key]['price']))
         #print(".", end="")
         sys.stdout.flush()
 
