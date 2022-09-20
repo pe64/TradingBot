@@ -13,5 +13,7 @@ class Bond:
 
         para = json.loads(js['para'])
         self.period = int(para['period'])
+        self.ttb_diff = int(para['ttb_diff'])
+        self.limit_days = int(para['limit_days'])
         
         pass

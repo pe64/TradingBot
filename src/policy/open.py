@@ -35,7 +35,11 @@ class OpenPst:
         return earn > self.hold * 100
 
 
-    def execute(self, code, current_charge, percent, today):
+    def execute(self, args):
+        code = args['code']
+        current_charge = args['price']
+        percent = args['percent']
+        today = args['today']
         if code not in self.asset_id:
             return
         
@@ -69,6 +73,7 @@ class OpenPst:
                 "asset_count": self.asset_count,
                 "vol": self.asset_count,
                 "price": current_charge,
+                "percent": percent,
                 "policy": self
             }
             ret = self.cta.sale_asset(para)

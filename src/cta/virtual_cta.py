@@ -51,7 +51,7 @@ class VirtualCta:
         #para['policy'].asset_count = para['policy'].asset_count + asset_num
         return (True, money_num, asset_num)
 
-    def update_policy_status(self, ids, cash_inuse, cash, asset_count, today,price):
+    def update_policy_status(self, ids, cash_inuse, cash, asset_count, today, price):
         pass
 
     def sale_asset(self, para):
@@ -83,11 +83,16 @@ class VirtualCta:
                 if charge is None or percent is None:
                     continue
 
+                para = {
+                    "code": code,
+                    "price": charge,
+                    "percent": percent,
+                    "today": self.date.replace("-","")
+                }
                 for p in self.policy:
                     if charge is None:
                         break
-
-                    p.execute(code, charge, percent, self.date.replace("-",""))
+                    p.execute(para)
 
             self.date = time_next_day(self.date)
             ts = time.strptime(self.date, "%Y-%m-%d")

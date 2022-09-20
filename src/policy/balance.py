@@ -45,7 +45,11 @@ class Balance:
 
             self.current_asset_value[id] = int(current_charge * self.asset_count[id])*100/100
 
-    def execute(self, code, current_charge, percent, today):
+    def execute(self, args):
+        code = args['code']
+        current_charge = args['price']
+        percent = args['percent']
+        today = args['today']
         if code not in self.asset_id or int(today) < self.date + self.period:
             return 
 

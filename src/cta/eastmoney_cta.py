@@ -191,15 +191,27 @@ class EastMoneyCta:
             ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['code']).get("Expansion")
             if len(ret['GSZZL']) !=0:
                 today = time.strftime("%Y%m%d",time.strptime(ret['GZTIME'], "%Y-%m-%d %H:%M"))
+                para = {
+                    "code": fund['code'],
+                    "price": ret['GZ'],
+                    "percent": float(ret['GSZZL']),
+                    "today": today
+                }
                 for p in self.policy:
-                    p.execute(fund['code'], ret['GZ'], float(ret['GSZZL']), today)
+                    p.execute(para)
         
         stocks = self.em_sq.get_stock_self_selection()
         for stock in stocks:
             ret = self.em[0].get_stock_real_charge(stock['code'], stock['market'])
             if ret is not None:
+                para = {
+                    "code": stock['code'],
+                    "price": float(ret['currentPrice']),
+                    "percent": float(ret['zdf']),
+                    "today": self.today
+                }
                 for p in self.policy:
-                    p.execute(stock['code'], float(ret['currentPrice']), float(ret['zdf']), self.today)
+                    p.execute(para)
         bond_dic = {}
         if self.check_stock_time():
             for em in self.em:

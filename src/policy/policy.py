@@ -41,8 +41,8 @@ class Policy:
         self.policy.cash_into = self.policy.cash_into + float(cash)
         return self.policy.cash_into
 
-    def execute(self, code, current_charge, percent, date):
-        self.policy.execute(code, current_charge, percent, date)
+    def execute(self, para):
+        self.policy.execute(para)
      
     def policy_status(self):
         return self.policy.policy_status()

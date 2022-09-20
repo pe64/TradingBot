@@ -48,7 +48,12 @@ class Martin:
         self.max_amount = max(self.max_amount, self.current_amount)
         self.min_amount = min(self.min_amount, self.current_amount)
 
-    def execute(self, code, current_charge, percent, date):
+    #def execute(self, code, current_charge, percent, date):
+    def execute(self, args):
+        code = args['code']
+        current_charge = args['price']
+        percent = args['percent']
+        date = args['today']
         if code not in self.asset_id or self.date + self.period > int(date):
             return 
 
@@ -86,6 +91,7 @@ class Martin:
                 "asset_count": self.asset_count,
                 "vol": self.asset_count,
                 "price": current_charge,
+                "percent": percent,
                 "policy": self
             } 
             ret, money, asset = self.cta.sale_asset(para)
