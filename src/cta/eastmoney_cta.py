@@ -206,8 +206,8 @@ class EastMoneyCta:
                 bonds = em.get_bond_code()
                 for bond in bonds:
                     days = em.get_bond_days(bond['Zqdm'], bond['Market'])
-                    ret, price, zdf = em.get_bond_yield(bond['Zqdm'])
-                    if price - self.ttb_yield > self.gconf['eastmoney']['bond']['diff']:
+                    ret, price, zdf, now = em.get_bond_yield(bond['Zqdm'])
+                    if price - self.ttb_yield > self.gconf['eastmoney']['bond']['diff'] and self.check_stock_time(now):
 
                         if bond_dic.get(days) is not None:
 
@@ -244,12 +244,16 @@ class EastMoneyCta:
         em.check_status(code, company)
         return em.fund_submit_trade(code, vol, "sale")
 
-    def check_stock_time(self):
-        st1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['trading_stock']['start1'], '%Y-%m-%d%H:%M')
-        et1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['trading_stock']['end1'], '%Y-%m-%d%H:%M')
-        st2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['trading_stock']['start2'], '%Y-%m-%d%H:%M')
-        et2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + self.gconf['period']['trading_stock']['end2'], '%Y-%m-%d%H:%M')
-        now_time = datetime.datetime.now()
+    def check_stock_time(self, now=None):
+        if now is None:
+            now_time = datetime.datetime.now()
+        else:
+            tmp = str(datetime.datetime.now().date()) + now
+            now_time = datetime.datetime.strptime(tmp, '%Y-%m-%d%H:%M:%S')
+        st1 = datetime.datetime.strptime(str(now_time.date()) + self.gconf['period']['trading_stock']['start1'], '%Y-%m-%d%H:%M')
+        et1 = datetime.datetime.strptime(str(now_time.date()) + self.gconf['period']['trading_stock']['end1'], '%Y-%m-%d%H:%M')
+        st2 = datetime.datetime.strptime(str(now_time.date()) + self.gconf['period']['trading_stock']['start2'], '%Y-%m-%d%H:%M')
+        et2 = datetime.datetime.strptime(str(now_time.date()) + self.gconf['period']['trading_stock']['end2'], '%Y-%m-%d%H:%M')
 
         return (now_time > st1 and now_time < et1) or (now_time > st2 and now_time < et2)
 

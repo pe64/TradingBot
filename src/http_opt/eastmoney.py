@@ -491,7 +491,6 @@ class HttpEM:
         id = text.find("{")
         if id != -1:
             js = json.loads(text[id:-2])
-            return True, float(js['realtimequote']["currentPrice"]), float(js["realtimequote"]['zdf'][:-1])
+            return True, float(js['realtimequote']["currentPrice"]), float(js["realtimequote"]['zdf'][:-1]), js['realtimequote']['time']
         else:
-            return False, None, None
-        pass
+            return False, None, None, None
