@@ -6,6 +6,7 @@ from policy.balance import Balance
 from policy.gerd import Gerd
 from policy.autobuy import AutoBuy
 from policy.open import OpenPst
+from policy.bond import Bond
 
 class Policy:
     def __init__(self, js, cta) -> None:
@@ -29,6 +30,8 @@ class Policy:
         elif js["type"] == "open":
             self.policy = OpenPst(js, cta)
             self.name = "低吸建仓"
+        elif js['type'] == "bond":
+            self.policy = Bond(js, cta)
 
     def get_policy_id(self):
         return int(self.policy.id)

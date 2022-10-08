@@ -13,7 +13,23 @@ class Bond:
 
         para = json.loads(js['para'])
         self.period = int(para['period'])
-        self.ttb_diff = int(para['ttb_diff'])
+        self.ttb_diff = float(para['ttb_diff'])
         self.limit_days = int(para['limit_days'])
+        self.cta = cta
         
         pass
+
+    def execute(self, args):
+        if args['type'] != "bond":
+            return 
+
+        code = args['code']
+        price = args['price']
+        percent = args['percent']
+        today = args['today']
+        limit_days = args['limit_days']
+        if code not in self.asset_id:
+            return
+    
+        para = {}
+        earn = 0

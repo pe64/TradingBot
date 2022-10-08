@@ -192,6 +192,7 @@ class EastMoneyCta:
             if len(ret['GSZZL']) !=0:
                 today = time.strftime("%Y%m%d",time.strptime(ret['GZTIME'], "%Y-%m-%d %H:%M"))
                 para = {
+                    "type": "fund",
                     "code": fund['code'],
                     "price": ret['GZ'],
                     "percent": float(ret['GSZZL']),
@@ -205,6 +206,7 @@ class EastMoneyCta:
             ret = self.em[0].get_stock_real_charge(stock['code'], stock['market'])
             if ret is not None:
                 para = {
+                    "type": "stock",
                     "code": stock['code'],
                     "price": float(ret['currentPrice']),
                     "percent": float(ret['zdf']),
@@ -219,10 +221,19 @@ class EastMoneyCta:
                 for bond in bonds:
                     days = em.get_bond_days(bond['Zqdm'], bond['Market'])
                     ret, price, zdf, now = em.get_bond_yield(bond['Zqdm'])
+                    para = {
+                        "type": "bond",
+                        "code": bond["Zqdm"],
+                        "market": bond["Market"],
+                        "percent": zdf,
+                        "price": price,
+                        "limit_days":days,
+                        "today":self.today
+                    }
+                    for p in self.policy:
+                        p.execute(para)
                     if price - self.ttb_yield > self.gconf['eastmoney']['bond']['diff'] and self.check_stock_time(now):
-
                         if bond_dic.get(days) is not None:
-
                             if bond_dic[days]["price"] > price:
                                 continue
                             else:
