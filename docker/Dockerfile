@@ -1,6 +1,6 @@
 FROM python:latest
 
-RUN pip install rsa easyocr log4python fire
+RUN pip install rsa pyyaml
 
 ADD ../ /root/TradingBot/
 
