@@ -345,11 +345,11 @@ class EastMoneyCta:
             asset = self.em_sq.get_asset_by_code(para['code'])
             contract = None
             if asset['type'] == "f" and self.check_fund_time():
-                vol = 0
+                vol = para['vol']
                 cash = para['vol'] * para['price']
                 contract = self.sale_fund(em, para['code'], para['vol'], asset['market'])
             elif asset['type'] == "s" and self.check_stock_time():
-                cash,vol = self.calc_asset(para['vol'], para['price'])
+                cash, vol = self.calc_asset(para['vol'], para['price'])
                 ret, contract = self.sale_stock(em, para['code'], para['price'], vol)
 
             if contract is None:

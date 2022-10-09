@@ -62,7 +62,7 @@ class OpenPst:
             if ret is True:
                 self.cash_inuse = self.cash_inuse + self.buy_count - free_cash
                 self.cash = self.cash - self.buy_count + free_cash
-                self.asset_count = self.asset_count + vol
+                self.asset_count = round(self.asset_count + vol,3)
                 self.date = today
                 self.cta.update_policy_status(self.id, self.cash_inuse, self.cash, self.asset_count, today, current_charge)
         elif self.check_sale_condition(earn):
@@ -76,13 +76,19 @@ class OpenPst:
                 "percent": percent,
                 "policy": self
             }
-            ret = self.cta.sale_asset(para)
+            ret, money, asset = self.cta.sale_asset(para)
             if ret is True:
-                self.cash_inuse = self.cash_inuse - self.cash_into
-                self.cash_into = 0
-                self.cash = round(self.asset_count * float(current_charge),2) + self.cash
-                self.asset_count = 0
+                self.cash = money + self.cash
+                self.cash_inuse = self.cash_inuse - money
+                self.cash_into = self.cash_into - money
+                if self.cash_into < 0:
+                    self.cash_into = 0
+                if self.cash_inuse < 0:
+                    self.cash_inuse = 0
+
+                self.asset_count = asset
                 self.date = today
+
                 self.cta.update_policy_status(self.id, self.cash_inuse, self.cash, self.asset_count, today, current_charge)
     
         self.update_policy_status(float(current_charge))
