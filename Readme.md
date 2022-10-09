@@ -4,7 +4,7 @@
 
 一个可以根据配置策略进行对股票基金进行操作的交易机器人，目前只支持东方财富证券交易所。
 
-![](./doc/脑图.png)
+![](doc/脑图.png)
 
 ## 策略说明
 
@@ -32,11 +32,11 @@
 
 2. 进入实盘策略
 
-python3 src/main.py eastcta
+`python3 src/main.py eastcta`
 
 3. 进入回测策略
 
-   `python3 src/main.py virtualcta`
+`python3 src/main.py virtualcta`
 
 ## 详细设计
 
