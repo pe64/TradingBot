@@ -540,3 +540,14 @@ eastmoney:
       'Sec-Fetch-Mode: no-cors',
       'Sec-Fetch-Site: cross-site',
     ]
+  
+  lending_bond:
+    url: "'https://jywg.18.cn/BondRepurchase/SecuritiesLendingRepurchaseTrade?validatekey="
+    headers: [
+      'Accept: application/json, text/javascript, */*; q=0.01',
+      'Content-Type: application/x-www-form-urlencoded',
+      'Origin: https://jywg.18.cn',
+      'Pragma: no-cache',
+      'Referer: https://jywg.18.cn/BondRepurchase/SecuritiesLendingRepurchase',
+      'X-Requested-With: XMLHttpRequest',
+    ]

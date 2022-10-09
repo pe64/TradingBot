@@ -228,10 +228,12 @@ class EastMoneyCta:
                         "percent": zdf,
                         "price": price,
                         "limit_days":days,
-                        "today":self.today
+                        "today":self.today,
+                        "ttb_yield": self.ttb_yield
                     }
                     for p in self.policy:
                         p.execute(para)
+
                     if price - self.ttb_yield > self.gconf['eastmoney']['bond']['diff'] and self.check_stock_time(now):
                         if bond_dic.get(days) is not None:
                             if bond_dic[days]["price"] > price:
@@ -414,3 +416,16 @@ class EastMoneyCta:
     def update_policy_status(self, policy_id, cash_inuse, cash, asset_count, today, price=None):
         self.em_sq.update_policy_status(policy_id, cash_inuse, cash, asset_count, today, price)
         pass
+
+    def lend_bond(self, para):
+        if self.check_stock_time():
+            price = para['price']
+            vol = para['vol']
+            code = para['code']
+            account_id = para['account_id']
+            for em in self.em:
+                if em.account_id != account_id:
+                    continue
+
+                em.lending_bond(code, price, vol)
+                

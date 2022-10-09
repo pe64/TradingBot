@@ -48,6 +48,7 @@ class HttpEM:
         self.bond_code_conf = cf['eastmoney']['get_bond_code']
         self.bond_days_conf = cf['eastmoney']['get_bond_days']
         self.bond_yield_conf = cf['eastmoney']['get_bond_yield']
+        self.lending_bond_conf = cf['eastmoney']['lending_bond']
         self.ttb_yield = 0
         self.validatekey = ""
         self.random = str(random.random())
@@ -436,9 +437,9 @@ class HttpEM:
             print("get ttb code error.")
             return False, None, None
         else:
-            jjdm = text[id+7: id + 13]
+            jjdm = text[id + 7: id + 13]
             id = text.find("jjgs:")
-            jjgs = text[id+7: id+9]
+            jjgs = text[id + 7: id + 9]
             return True, jjdm, jjgs
 
     def get_ttb_yield(self, jjdm, jjgs):
@@ -494,3 +495,20 @@ class HttpEM:
             return True, float(js['realtimequote']["currentPrice"]), float(js["realtimequote"]['zdf'][:-1]), js['realtimequote']['time']
         else:
             return False, None, None, None
+    
+    def lending_bond(self, code, price, vol):
+        url = self.lending_bond_conf['url'] + self.validatekey
+        headers = self.build_headers(self.lending_bond_conf['headers'])
+
+        data = {
+            "zqdm": code,
+            "rqjg": price,
+            "rqsl": vol
+        }
+
+        js = self.http_post(url, data, headers)
+        if js["Status"] == 0:
+            return js['Data'][0]['Wtbh']
+        else:
+            print("lend bond error. %s" % js["Message"])
+            return None
