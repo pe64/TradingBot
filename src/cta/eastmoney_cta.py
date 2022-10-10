@@ -418,14 +418,19 @@ class EastMoneyCta:
         pass
 
     def lend_bond(self, para):
-        if self.check_stock_time():
-            price = para['price']
-            vol = para['vol']
-            code = para['code']
-            account_id = para['account_id']
-            for em in self.em:
-                if em.account_id != account_id:
-                    continue
+        price = para['price']
+        vol = para['vol']
+        code = para['code']
+        account_id = para['account_id']
+        for em in self.em:
+            if em.account_id != account_id:
+                continue
 
-                em.lending_bond(code, price, vol)
-                
+            #contract = em.lending_bond(code, price, vol/100)
+            print("买入国债[%s] [%s] [%d]"%(code, price, vol))
+            #if contract is not None:
+            #    ret = self.check_order_success(em, contract)
+            #    return ret
+            #else:
+            #    return False 
+            pass

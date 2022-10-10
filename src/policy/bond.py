@@ -9,6 +9,7 @@ class Bond:
         self.asset_count = float(js['asset_count'])
         self.cash_inuse = float(js['cash_inuse'])
         self.cash_into = float(js['cash_into'])
+        self.price = float(js['price'])
         self.date = int(js['date'])
 
         para = json.loads(js['para'])
@@ -16,7 +17,6 @@ class Bond:
         self.ttb_diff = float(para['ttb_diff'])
         self.limit_days = int(para['limit_days'])
         self.buy_count = int(para['buy_count'])
-        self.last_price = 0.0
         self.buy_count_limit = 1000
         self.cta = cta
         
@@ -50,3 +50,11 @@ class Bond:
                 "vol": vol,
             }
             ret = self.cta.lend_bond(para)
+            if ret is True:
+                self.price = price
+                self.cash = self.cash - vol
+                self.cash_into = self.cash_into + vol
+                self.cash_inuse = self.cash_inuse + vol
+                self.asset_count = self.asset_count + vol/100
+                self.cta.update_policy_status(self.id, self.cash_inuse, self.cash, self.asset_count, today, price)
+                pass
