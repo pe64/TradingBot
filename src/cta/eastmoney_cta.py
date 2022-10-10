@@ -290,12 +290,12 @@ class EastMoneyCta:
         return now_time > st and now_time < et
 
     def check_order_success(self, em, order):
-        flags = True
+        flags = False
         ret = True
         for times in range(1,3):
             contracts = em.get_deal_data()
-            if order not in contracts:
-                flags = False
+            if order in contracts:
+                flags = True
                 break
             times = times + 1
             time.sleep(5)
@@ -377,7 +377,7 @@ class EastMoneyCta:
         return cash, sell_num
     
     def calc_price(self, buy_count, price):
-        vol = (buy_count/price/100)*100
+        vol = int(buy_count/price/100)*100
         cash = buy_count - vol * price
         return cash,vol
 
@@ -396,7 +396,7 @@ class EastMoneyCta:
                 ret, contract = self.buy_fund(em, para['code'], para['buy_count'])
             elif asset['type'] == "s" and self.check_stock_time():
                 free_cash, vol = self.calc_price(para['buy_count'], para['price'])
-                ret, contract = self.buy_stock(em, para['code'], vol, para['price'])
+                ret, contract = self.buy_stock(em, para['code'], para['price'], vol)
 
             if contract is None or ret is False:
                 continue

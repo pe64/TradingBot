@@ -319,6 +319,7 @@ class HttpEM:
             print("submit_success order [%s]"%js["Data"][0]["Wtbh"])
             return js["Data"][0]["Wtbh"]
         else:
+            print("submit trade error %s"%(js["Message"]))
             return None
     
     def get_stock_list(self):
