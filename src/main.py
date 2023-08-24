@@ -3,7 +3,7 @@ import json
 import time
 import datetime
 #from EastMoney import EastMoney
-
+from asset_charge.asset_charge import AssetCharge
 from threading import Thread
 from cta.fund51_cta import Fund51Cta
 from conf.yaml_conf import yaml_load
@@ -15,6 +15,7 @@ from cta.virtual_cta import VirtualCta
 from http_opt.fund51_http import HttpFund51
 from http_opt.eastmoney import HttpEM
 from cta.eastmoney_cta import EastMoneyCta
+from redis_opt.redis import Redis
 from ocr.ocr import *
 
 def fund51_cta_daemon(*add):
@@ -127,7 +128,12 @@ def main(argv):
         while True:
             emcta.cta_run()
             time.sleep(120)
-        
+    elif argv[1] == "redis":
+        ac = AssetCharge(cf)
+        ac.run()
+        #rd = Redis(cf)
+        #rd.Publish("test", "aaaaaa")
+        #rd.BRPop("test")
 
 
 
@@ -153,6 +159,8 @@ def main(argv):
 
     #"2022-08-23 ,27.31 ,27.39 ,27.50 ,27.15 ,123497,337263045.00,1.28,0.44,0.12,1.38"
     #"日期 开盘价 收盘价 最高价 最低价 成交量 成交额 振幅 涨幅 - 换手率"
+
+
 
     pass
 

@@ -10,8 +10,9 @@
             "request": "launch",
             "program": "${workspaceFolder}/src/main.py",
             "console": "integratedTerminal",
+            "cwd":"${workspaceFolder}",
             "justMyCode": true,
-            "args": ["eastcta","history"]
+            "args": ["redis"]
         }
     ]
 }

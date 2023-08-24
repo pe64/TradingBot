@@ -1,6 +1,7 @@
 import json
 from urllib import request
 import time
+import re
 
 def build_headers(conf_head):
     headers = {
@@ -22,23 +23,22 @@ def build_headers(conf_head):
 
 def fund_http_real_time_charge(conf, fcode):
     url = conf["url"] + \
-            conf["path"] + \
-            conf["real_time_charge"]["file"] + \
-            "?FCODE=" + fcode + "&"
-    for arg in conf["real_time_charge"]["arguments"] :
-        url = url + arg + "&"
+            conf["path"] + fcode +".js"
+    #for arg in conf["real_time_charge"]["arguments"] :
+    #    url = url + arg + "&"
         
-    url = url +"_="
+    #url = url + "Fcodes=" + fcode 
 
-    ts = time.time()
-
-    url = url + str(int(ts))
+    #url = url +"_="
+    #ts = time.time()
+    #url = url + str(int(ts))
 
     headers = build_headers(conf["headers"])
 
     req = request.Request(url, headers=headers)
     response = request.urlopen(req)
     ret = response.read().decode('utf-8')
+    ret = re.search(r'jsonpgz\((.*?)\);', ret).group(1)
     js = json.loads(ret)
     return js
 

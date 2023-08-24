@@ -11,7 +11,8 @@ class SqliteEM:
         self.cur.execute('SELECT code, name FROM collect WHERE type = "f"')
         rows = self.cur.fetchall()
         for row in rows:
-            res.append({"code": row[0], "name": row[1]})
+            #res.append({"code": row[0], "name": row[1]})
+            res.append(row[0])
         return res
     
     def get_asset_by_id(self, id):
