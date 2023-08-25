@@ -5,6 +5,15 @@ class SqliteEM:
         self.conn = sqlite3.connect(db_path)
         self.cur = self.conn.cursor()
         pass
+    
+    def get_coin_self_selection(self):
+        res = []
+        self.cur.execute('SELECT code FROM collect WHERE type = "c"')
+        rows = self.cur.fetchall()
+        for row in rows:
+            res.append(row[0])
+        
+        return res
 
     def get_fund_self_selection(self):
         res = []

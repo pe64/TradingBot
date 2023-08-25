@@ -20,6 +20,16 @@ logging:
   level: "info"
   date_format: "%m-%d-%Y %H:%M:%S %p"
 
+binance:
+  http_proxy: "http://127.0.0.1:7890"
+  https_proxy: "http://127.0.0.1:7890"
+  url: "https://api.binance.com"
+  kline: "/api/v3/klines"
+
+stock:
+  url: "http://hq.sinajs.cn/list="
+  referer: "http://finance.sina.com.cn"
+
 period:
   trading_fund:
     start: "14:40"

@@ -16,6 +16,7 @@ from http_opt.fund51_http import HttpFund51
 from http_opt.eastmoney import HttpEM
 from cta.eastmoney_cta import EastMoneyCta
 from redis_opt.redis import Redis
+from binance.binance import BinanceOpt
 from ocr.ocr import *
 
 def fund51_cta_daemon(*add):
@@ -134,7 +135,9 @@ def main(argv):
         #rd = Redis(cf)
         #rd.Publish("test", "aaaaaa")
         #rd.BRPop("test")
-
+    elif argv[1] == "binance":
+        bn = BinanceOpt(cf)
+        bn.get_kline_data(symbol="BTCUSDT", interval="1h")
 
 
     #    sqlite.insert_fund_table
