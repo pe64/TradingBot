@@ -25,6 +25,7 @@ binance:
   https_proxy: "http://127.0.0.1:7890"
   url: "https://api.binance.com"
   kline: "/api/v3/klines"
+  price: "/api/v3/ticker/price"
 
 stock:
   url: "http://hq.sinajs.cn/list="
