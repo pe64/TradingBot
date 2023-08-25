@@ -25,6 +25,7 @@ class StockCharge:
                 "cur": float(stock_info[3]),
                 "high": float(stock_info[4]),
                 "low": float(stock_info[5]),
+                "percent": round((float(stock_info[3]) - float(stock_info[2])) / float(stock_info[2]) * 100, 2),
                 "volume": int(stock_info[8]),
                 "timestamp": stock_info[30] + " " + stock_info[31]
             }
