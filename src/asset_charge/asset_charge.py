@@ -1,17 +1,18 @@
 import time
 from datetime import datetime, timedelta
 import json
-from db.em_sqlite import SqliteEM
+from db.asset_db import AssetDB
 from http_opt.fund_http import fund_http_real_time_charge
 from redis_opt.redis import Redis
 from binance.binance import BinanceOpt
 from stock.stock_charge import StockCharge
 import threading
+from conf.yaml_conf import yaml_load
 
 class AssetCharge:
     def __init__(self, cf):
         self.gconf = cf
-        self.em_sq = SqliteEM(cf['sqlite_path']['em'])
+        self.adb = AssetDB(cf['sqlite_path']['asset'])
         self.bn = BinanceOpt(cf)
         self.stock = StockCharge(cf)
         self.rd = Redis(cf)
@@ -66,9 +67,9 @@ class AssetCharge:
             time.sleep(10)
 
     def run(self):
-        funds = self.em_sq.get_fund_self_selection()
-        stocks = self.em_sq.get_stock_self_selection()
-        coins = self.em_sq.get_coin_self_selection()
+        funds = self.adb.get_fund_self_selection()
+        stocks = self.adb.get_stock_self_selection()
+        coins = self.adb.get_coin_self_selection()
         
 
         fund_thread = threading.Thread(target=self.fetch_assets, args=(funds, self.fetch_fund_data))
@@ -82,3 +83,4 @@ class AssetCharge:
         fund_thread.join()
         stock_thread.join()
         coin_thread.join()
+

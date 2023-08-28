@@ -138,6 +138,7 @@ def main(argv):
     elif argv[1] == "binance":
         bn = BinanceOpt(cf)
         bn.get_kline_data(symbol="BTCUSDT", interval="1h")
+    
 
 
     #    sqlite.insert_fund_table

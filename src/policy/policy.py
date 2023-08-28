@@ -1,6 +1,7 @@
 import json
 from locale import currency
 
+from db.policy_db import PolicyDB
 from policy.martin import Martin
 from policy.balance import Balance
 from policy.gerd import Gerd
@@ -9,29 +10,26 @@ from policy.open import OpenPst
 from policy.bond import Bond
 
 class Policy:
-    def __init__(self, js, cta) -> None:
-        #self.police = []
-        #js = {}
-        #with open(conf_path, "r") as f:
-        #    line = f.read()
-        #    js = json.loads(line)
-        #js = cta.get_policy_config()
-        self.name = ""
-        if js["type"] == "autobuy":
-            self.policy = AutoBuy(js, cta)
-        elif js["type"] == "balance":
-            self.policy = Balance(js, cta)
-        elif js["type"] == "gerd":
-            self.policy = Gerd(js, cta)
-            self.name = "平衡策略"
-        elif js["type"] == "martin":
-            self.policy = Martin(js, cta)
-            self.name = "马丁策略"
-        elif js["type"] == "open":
-            self.policy = OpenPst(js, cta)
-            self.name = "低吸建仓"
-        elif js['type'] == "bond":
-            self.policy = Bond(js, cta)
+    def __init__(self, cf) -> None:
+        self.pdb = PolicyDB(cf["db_path"]["policy"])
+        policys = self.pdb.get_policys()
+
+        #self.name = ""
+        #if js["type"] == "autobuy":
+        #    self.policy = AutoBuy(js, cta)
+        #elif js["type"] == "balance":
+        #    self.policy = Balance(js, cta)
+        #elif js["type"] == "gerd":
+        #    self.policy = Gerd(js, cta)
+        #    self.name = "平衡策略"
+        #elif js["type"] == "martin":
+        #    self.policy = Martin(js, cta)
+        #    self.name = "马丁策略"
+        #elif js["type"] == "open":
+        #    self.policy = OpenPst(js, cta)
+        #    self.name = "低吸建仓"
+        #elif js['type'] == "bond":
+        #    self.policy = Bond(js, cta)
 
     def get_policy_id(self):
         return int(self.policy.id)
