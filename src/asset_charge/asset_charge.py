@@ -39,6 +39,7 @@ class AssetCharge:
                 "code": ret["fundcode"],
                 "name": ret["name"],
                 "open": ret['dwjz'],
+                "close": ret['dwjz'],
                 "cur": ret['gsz'],
                 "percent": ret["gszzl"],
                 "timestamp": ret["gztime"]
