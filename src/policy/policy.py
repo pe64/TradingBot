@@ -1,4 +1,7 @@
 import json
+import threading
+
+from redis_opt.redis import Redis
 from locale import currency
 
 from db.policy_db import PolicyDB
@@ -10,41 +13,52 @@ from policy.open import OpenPst
 from policy.bond import Bond
 
 class Policy:
-    def __init__(self, cf) -> None:
-        self.pdb = PolicyDB(cf["db_path"]["policy"])
-        policys = self.pdb.get_policys()
-
-        #self.name = ""
-        #if js["type"] == "autobuy":
-        #    self.policy = AutoBuy(js, cta)
-        #elif js["type"] == "balance":
-        #    self.policy = Balance(js, cta)
-        #elif js["type"] == "gerd":
-        #    self.policy = Gerd(js, cta)
-        #    self.name = "平衡策略"
-        #elif js["type"] == "martin":
-        #    self.policy = Martin(js, cta)
-        #    self.name = "马丁策略"
-        #elif js["type"] == "open":
-        #    self.policy = OpenPst(js, cta)
-        #    self.name = "低吸建仓"
-        #elif js['type'] == "bond":
-        #    self.policy = Bond(js, cta)
-
-    def get_policy_id(self):
-        return int(self.policy.id)
-
-    def add_asset_count(self, asset_count):
-        self.policy.asset_count = self.policy.asset_count + float(asset_count)
-        return self.policy.asset_count
+    def __init__(self, config) -> None:
+        self.policy_db = PolicyDB(config["db_path"]["policy"])
+        self.policies = self.pdb.get_policys()
+        self.redis_client = Redis(config)
+        self.threads = []
     
-    def add_cash_into(self, cash):
-        self.policy.cash_into = self.policy.cash_into + float(cash)
-        return self.policy.cash_into
+    def create_policy_instance(self, policy_config):
+        policy_type = policy_config["type"]
+        if policy_type == "autobuy":
+            return AutoBuy(policy_config)
+        elif policy_type == "balance":
+            return Balance(policy_config)
+        elif policy_type == "gerd":
+            return Gerd(policy_config)
+        elif policy_type == "martin":
+            return Martin(policy_config)
+        elif policy_type == "open":
+            return OpenPst(policy_config)
+        elif policy_type == "bond":
+            return Bond(policy_config)
+        else:
+            raise ValueError(f"Unsupported policy type: {policy_type}")
+    
+    def run_policies_in_thread(self):
+        for policy_config in self.policys:
+            policy_instance = self.create_policy_instance(policy_config)
+            policy_thread = threading.Thread(target=self.run_policy, args=(policy_instance,))
+            self.threads.append(policy_thread)
+            policy_thread.start()
 
-    def execute(self, para):
-        self.policy.execute(para)
-     
-    def policy_status(self):
-        return self.policy.policy_status()
-                
+    def run_policy(self, policy):
+       asset_id = policy.asset_id
+
+       while True:
+            self.rd.PSubscribe(asset_id, policy, callback=self.charge_callback)
+
+    def charge_callback(self, channel, charge, exe_policy):
+        para = {}
+        popt = exe_policy.execult(charge)
+        if popt == None:
+            return
+        elif popt['opt'] == "BUY":
+            self.rd.LPush("left:" + exe_policy.account_id, para)
+            ret_opt = self.rd.BRPop("right" + exe_policy.acount_id)
+        elif popt['opt'] == "SALE":
+            self.rd.LPush("left" + exe_policy.account_id, para)
+            ret_opt = self.rd.BRPop("right:" + exe_policy.acount_id)
+
+        pass

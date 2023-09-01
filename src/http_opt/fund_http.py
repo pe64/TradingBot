@@ -16,7 +16,7 @@ def build_headers(conf_head):
         "User-Agent": conf_head["user_agent"],
         "sec-ch-ua": conf_head["sec_ch_ua"],
         "sec-ch-ua-mobile": conf_head["sec_ch_ua_mobile"],
-        "sec-ch-ua-platform": conf_head["sec_ch_ua_platform"]
+        "sec-ch-ua-platform": conf_head["sec_ch_ua_platform"],
     }
 
     return headers
@@ -34,11 +34,16 @@ def fund_http_real_time_charge(conf, fcode):
     #url = url + str(int(ts))
 
     headers = build_headers(conf["headers"])
+    headers['upgrade-insecure-requests'] = 1
+    headers['authority'] = "fund.rabt.top"
+
+
 
     req = request.Request(url, headers=headers)
     response = request.urlopen(req)
-    ret = response.read().decode('utf-8')
-    ret = re.search(r'jsonpgz\((.*?)\);', ret).group(1)
+    ret = response.read()
+    response_str = ret.decode('utf-8')
+    ret = re.search(r'jsonpgz\((.*?)\);', response_str).group(1)
     js = json.loads(ret)
     return js
 

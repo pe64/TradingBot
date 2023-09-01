@@ -1,5 +1,5 @@
 class AutoBuy:
-    def __init__(self, js, cta) -> None:
+    def __init__(self, js) -> None:
         self.id = js["id"]
         self.asset_ids = js["asset_id"]
         self.cash = js["cash"]
@@ -10,7 +10,7 @@ class AutoBuy:
         self.aver_charge = 0.0
         self.start_amount = self.cash
         self.next_buy_charge = None
-        self.cta = cta
+        #self.cta = cta
         self.current_amount = self.cash
         self.current_earn_percent = 0.0
         self.current_into = 0.0

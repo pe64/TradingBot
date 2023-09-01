@@ -11,10 +11,19 @@ class Redis:
         for message in self.pubsub.listen():
             if message['type'] == 'message':
                 if callback:
-                    callback(message['data'])
+                    callback(message['channel'], message['data'])
                 else:
-                    return message['data']
+                    return message['channel'], message['data']
 
+    def PSubscribe(self, pattern, policy, callback=None):
+        self.pubsub.psubscribe(pattern)
+        for message in self.pubsub.listen():
+            if message['type'] == 'pmessage':
+                if callback:
+                    callback(message['channel'], message['data'], policy)
+                else:
+                    return message['channel'], message['data']
+    
     def Publish(self, key, content):
         self.r.publish(key, content) 
     

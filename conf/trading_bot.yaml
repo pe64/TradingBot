@@ -55,7 +55,7 @@ web_api:
     path: "/api/js/"
     all_fund_url: "https://fund.eastmoney.com/js/fundcode_search.js"
     headers: 
-      accept: "application/json, text/plain, */*"
+      accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
       accept_language: "zh-CN,zh;q=0.9"
       cache_control: "no-cache"
       connection: "keep-alive"

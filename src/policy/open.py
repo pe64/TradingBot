@@ -1,5 +1,4 @@
 import json
-from db.em_sqlite import SqliteEM
 
 class OpenPst:
     def __init__(self, js, cta) -> None:
