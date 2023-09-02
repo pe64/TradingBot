@@ -56,6 +56,9 @@ class AssetCharge:
         current_utc_time = datetime.utcnow()
         start_time_stamp, end_time_stamp = self.get_time_range(current_utc_time)
         ret = self.bn.get_kline_data(coin, "8h", start_time_stamp, end_time_stamp)
+        if ret is None:
+            return
+
         ret['timestamp'] = time.strftime("%Y-%m-%d %H:%M", time.localtime())
         self.rd.Publish("coin#binance#8h#" + coin, json.dumps(ret))
 
