@@ -24,8 +24,8 @@ class BinanceOpt:
     
             kline_data = response.json()
             if len(kline_data) > 0:
-                ret["code:"] = symbol
-                ret["name:"] = symbol
+                ret["symbol"] = symbol
+                ret["name"] = symbol
                 ret["open"] = kline_data[0][1]
                 ret["close"]= kline_data[0][4]
                 ret["cur"]= kline_data[0][4]

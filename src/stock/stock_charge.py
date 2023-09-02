@@ -19,7 +19,7 @@ class StockCharge:
                 stock_info = data.split(',')
 
                 return {
-                    "code": code,
+                    "symbol": code,
                     "name": stock_info[0],
                     "open": float(stock_info[1]),
                     "close": float(stock_info[2]),

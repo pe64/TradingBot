@@ -3,7 +3,7 @@ class AutoBuy:
         self.id = js["id"]
         self.asset_ids = js["asset_id"]
         self.cash = js["cash"]
-        self.start_charge = js["start_charge"]
+        self.start_charge = 0.0
         self.percent = js["percent"]
         self.buy_counts = js["buy_count"]
         self.asset_count = js["asset_count"]

@@ -37,3 +37,8 @@ class Redis:
             return data
         return None
     
+    def Set(self, key, value):
+        self.r.set(key, value)
+
+    def Get(self, key):
+        return self.r.get(key)

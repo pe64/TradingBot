@@ -12,7 +12,7 @@ from conf.yaml_conf import yaml_load
 class AssetCharge:
     def __init__(self, cf):
         self.gconf = cf
-        self.adb = AssetDB(cf['sqlite_path'])
+        self.asset_db = AssetDB(cf['sqlite_path'])
         self.bn = BinanceOpt(cf)
         self.stock = StockCharge(cf)
         self.rd = Redis(cf)
@@ -34,10 +34,10 @@ class AssetCharge:
         return start_time_stamp, end_time_stamp
 
     def fetch_fund_data(self, fund):
-        ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund)
+        ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['symbol'])
         if ret is not None:
             charge = {
-                "code": ret["fundcode"],
+                "symbol": ret["fundcode"],
                 "name": ret["name"],
                 "open": ret['dwjz'],
                 "close": ret['dwjz'],
@@ -45,22 +45,22 @@ class AssetCharge:
                 "percent": ret["gszzl"],
                 "timestamp": ret["gztime"]
             }
-            self.rd.Publish("fund#" + fund, json.dumps(charge))
+            self.rd.Publish("fund#" + fund['symbol'], json.dumps(charge))
 
     def fetch_stock_data(self, stock):
-        ret = self.stock.get_stock_charge(stock['code'], stock['market'])
+        ret = self.stock.get_stock_charge(stock['symbol'], stock['market'])
         if ret is not None:
-            self.rd.Publish("stock#" + stock['code'], json.dumps(ret))
+            self.rd.Publish("stock#" + stock['symbol'], json.dumps(ret))
 
     def fetch_coin_data(self, coin):
         current_utc_time = datetime.utcnow()
         start_time_stamp, end_time_stamp = self.get_time_range(current_utc_time)
-        ret = self.bn.get_kline_data(coin, "8h", start_time_stamp, end_time_stamp)
+        ret = self.bn.get_kline_data(coin['symbol'], "8h", start_time_stamp, end_time_stamp)
         if ret is None:
             return
 
         ret['timestamp'] = time.strftime("%Y-%m-%d %H:%M", time.localtime())
-        self.rd.Publish("coin#binance#8h#" + coin, json.dumps(ret))
+        self.rd.Publish("coin#binance#8h#" + coin['symbol'], json.dumps(ret))
 
     def fetch_assets(self, asset_list, fetch_func):
         while True:
@@ -69,12 +69,17 @@ class AssetCharge:
                 fetch_func(asset)
             time.sleep(10)
 
-    def run(self):
-        funds = self.adb.get_fund_self_selection()
-        stocks = self.adb.get_stock_self_selection()
-        coins = self.adb.get_coin_self_selection()
-        
+    def upload_asset(self, assets):
+        for asset in assets:
+            self.rd.Set("asset#" + str(asset['id']), json.dumps(asset))
 
+    def run(self):
+        funds = self.asset_db.get_fund_self_selection()
+        stocks = self.asset_db.get_stock_self_selection()
+        coins = self.asset_db.get_coin_self_selection()
+        self.upload_asset(funds)
+        self.upload_asset(stocks)
+        self.upload_asset(coins)
         fund_thread = threading.Thread(target=self.fetch_assets, args=(funds, self.fetch_fund_data))
         stock_thread = threading.Thread(target=self.fetch_assets, args=(stocks, self.fetch_stock_data))
         coin_thread = threading.Thread(target=self.fetch_assets, args=(coins, self.fetch_coin_data))

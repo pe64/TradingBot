@@ -28,10 +28,9 @@ CREATE TABLE "policy" (
   , cash TEXT
   , cash_into TEXT DEFAULT(0.00)
   , cash_inuse TEXT DEFAULT(0.00)
-  , price TEXT
+  , condition TEXT
   , asset_count TEXT DEFAULT(0)
-  , date TEXT
-  , para TEXT
+  , timestamp TEXT
 );
 
 PRAGMA foreign_keys = true;
