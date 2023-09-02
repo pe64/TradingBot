@@ -9,12 +9,7 @@ redis:
   port: 6379
   timeout: 10
 
-sqlite_path: 
-  fund: "db_file/fund.db"
-  stock: "db_file/stock.db"
-  asset: "db_file/asset.db"
-  policy: "db_file/policy.db"
-  account: "db_file/account.db"
+sqlite_path: "db_file/common.db"
 
 logging:
   format: "%(asctime)s - %(levelname)s - %(message)s"

@@ -12,7 +12,7 @@ from conf.yaml_conf import yaml_load
 class AssetCharge:
     def __init__(self, cf):
         self.gconf = cf
-        self.adb = AssetDB(cf['sqlite_path']['asset'])
+        self.adb = AssetDB(cf['sqlite_path'])
         self.bn = BinanceOpt(cf)
         self.stock = StockCharge(cf)
         self.rd = Redis(cf)
