@@ -2,6 +2,8 @@ import json
 from urllib import request
 import time
 import re
+import io
+import gzip
 
 def build_headers(conf_head):
     headers = {
@@ -37,12 +39,22 @@ def fund_http_real_time_charge(conf, fcode):
     headers['upgrade-insecure-requests'] = 1
     headers['authority'] = "fund.rabt.top"
 
-
-
     req = request.Request(url, headers=headers)
     response = request.urlopen(req)
-    ret = response.read()
-    response_str = ret.decode('utf-8')
+    content_encoding = response.info().get('Content-Encoding')
+
+    if content_encoding == 'gzip':
+        compress_data = response.read()
+        buffer = io.BytesIO(compress_data)
+        with gzip.GzipFile(fileobj=buffer) as f:
+            data = f.read()
+    
+    else: 
+        data = response.read()
+
+    encoding = response.info().get_content_charset('utf-8')
+
+    response_str = data.decode(encoding)
     ret = re.search(r'jsonpgz\((.*?)\);', response_str).group(1)
     js = json.loads(ret)
     return js
