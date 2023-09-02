@@ -38,26 +38,28 @@ def fund_http_real_time_charge(conf, fcode):
     headers = build_headers(conf["headers"])
     headers['upgrade-insecure-requests'] = 1
     headers['authority'] = "fund.rabt.top"
+    try:
+        req = request.Request(url, headers=headers)
+        response = request.urlopen(req)
+        content_encoding = response.info().get('Content-Encoding')
 
-    req = request.Request(url, headers=headers)
-    response = request.urlopen(req)
-    content_encoding = response.info().get('Content-Encoding')
-
-    if content_encoding == 'gzip':
-        compress_data = response.read()
-        buffer = io.BytesIO(compress_data)
-        with gzip.GzipFile(fileobj=buffer) as f:
-            data = f.read()
+        if content_encoding == 'gzip':
+            compress_data = response.read()
+            buffer = io.BytesIO(compress_data)
+            with gzip.GzipFile(fileobj=buffer) as f:
+                data = f.read()
     
-    else: 
-        data = response.read()
+        else: 
+            data = response.read()
 
-    encoding = response.info().get_content_charset('utf-8')
+        encoding = response.info().get_content_charset('utf-8')
 
-    response_str = data.decode(encoding)
-    ret = re.search(r'jsonpgz\((.*?)\);', response_str).group(1)
-    js = json.loads(ret)
-    return js
+        response_str = data.decode(encoding)
+        ret = re.search(r'jsonpgz\((.*?)\);', response_str).group(1)
+        js = json.loads(ret)
+        return js
+    except:
+        return None
 
 def fund_http_history_charge(conf, fcode):
     url = conf["url"] + conf["path"] + conf["history_charge"]["file"] + '?FCODE=' + fcode + '&' 
