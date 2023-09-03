@@ -7,4 +7,8 @@ class AutoSale:
     
     def execult(self, charge):
         print(charge)
-        pass
+        ret = {
+            "opt":"SALE",
+            "price":charge['cur']
+        }
+        return ret
