@@ -65,15 +65,13 @@ class Policy:
             self.redis_client.PSubscribe(subscribe_key, policy, callback=self.charge_callback)
 
     def charge_callback(self, channel, charge, exe_policy):
-        para = {}
-        popt = exe_policy.execult(json.loads(charge))
-        if popt == None:
-            return
-        elif popt['opt'] == "BUY":
-            self.rd.LPush("left#trade#" + exe_policy.account_id, para)
-            ret_opt = self.rd.BRPop("right#trade#" + exe_policy.acount_id)
-        elif popt['opt'] == "SALE":
-            self.rd.LPush("left#trade#" + exe_policy.account_id, para)
-            ret_opt = self.rd.BRPop("right#trade#" + exe_policy.acount_id)
 
-        pass
+        trade_message = exe_policy.execult(json.loads(charge))
+        if trade_message is None:
+            return
+        
+        self.redis_client.LPush("left#trade#" + str(exe_policy.account_id), trade_message['trade'])
+        trade_back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id))
+
+        exe_policy.after_trade(trade_back)
+        
