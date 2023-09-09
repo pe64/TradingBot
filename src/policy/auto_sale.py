@@ -8,7 +8,7 @@ class AutoSale:
     
     def execult(self, charge):
         ret = {
-            "trade":"SALE",
+            "trade":"SELL",
             "price":charge['cur']
         }
         return ret

@@ -25,7 +25,7 @@ CREATE TABLE "account" (
   , duration INTEGER
   , password TEXT
 );
-
+ALTER TABLE "account" ADD COLUMN "type" TEXT;
 -- ----------------------------
 -- Auto increment value for account
 -- ----------------------------

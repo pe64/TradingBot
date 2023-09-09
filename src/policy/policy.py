@@ -70,8 +70,8 @@ class Policy:
         if trade_message is None:
             return
         
-        self.redis_client.LPush("left#trade#" + str(exe_policy.account_id), trade_message['trade'])
-        trade_back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id))
+        self.redis_client.LPush("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
+        trade_back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id), 30)
 
         exe_policy.after_trade(trade_back)
         

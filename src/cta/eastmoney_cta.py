@@ -100,8 +100,8 @@ class EastMoneyCta:
                         print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:\033[31m%s\033[33m元.\033[0m"%(node['Zzc'],node['Kyzj'],node['Ljyk'])) 
 
                 self.update_account_status(em)
-                self.init_policy(em)
-                self.update_policy(em)
+                #self.init_policy(em)
+                #self.update_policy(em)
                 self.init_flag = self.init_flag + 1
             
             if self.check_policy_update_time():

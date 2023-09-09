@@ -6,6 +6,18 @@ class AccountDB:
         self.conn = sqlite3.connect(db_path)
         self.cur = self.conn.cursor()
         pass
+    
+    def get_binance_accounts(self):
+        res = []
+        self.cur.execute('SELECT id, userid, duration, password FROM account WHERE type = "binance"')
+        rows = self.cur.fetchall()
+        for row in rows:
+            res.append({
+                "id": row[0],
+                "API_KEY": row[1],
+                "API_SECRET": row[3]
+            })
+        return res
 
     def get_account_by_id(self, id):
        self.cur.execute('SELECT id, userid, duration, password FROM account') 

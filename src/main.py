@@ -16,7 +16,7 @@ from http_opt.fund51_http import HttpFund51
 from http_opt.eastmoney import HttpEM
 from cta.eastmoney_cta import EastMoneyCta
 from redis_opt.redis import Redis
-from binance.binance import BinanceOpt
+from http_opt.binance_http import BinanceOpt
 from ocr.ocr import *
 
 def fund51_cta_daemon(*add):

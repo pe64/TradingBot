@@ -23,6 +23,8 @@ binance:
   url: "https://api.binance.com"
   kline: "/api/v3/klines"
   price: "/api/v3/ticker/price"
+  order: "/api/v3/order"
+  asset: "/sapi/v3/asset/getUserAsset"
 
 stock:
   url: "http://hq.sinajs.cn/list="
