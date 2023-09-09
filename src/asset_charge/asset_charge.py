@@ -16,9 +16,29 @@ class AssetCharge:
         self.bn = BinanceOpt(cf)
         self.stock = StockCharge(cf)
         self.rd = Redis(cf)
-        
+    
     @staticmethod
-    def get_time_range(current_utc_time):
+    def get_time_range_1w(current_utc_time):
+        # 计算前7天的UTC时间
+        start_time = current_utc_time - timedelta(days=7)
+    
+        # 计算当前UTC时间
+        end_time = current_utc_time
+    
+        return start_time, end_time
+
+    @staticmethod
+    def get_time_range_1d(current_utc_time):
+        # 计算前一天的UTC 00:00时间
+        start_time = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)
+    
+        # 计算当前UTC时间
+        end_time = current_utc_time
+    
+        return start_time, end_time
+
+    @staticmethod
+    def get_time_range_8h(current_utc_time):
         if 0 <= current_utc_time.hour < 8:
             start_time = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
             end_time = start_time.replace(hour=8)
@@ -54,13 +74,32 @@ class AssetCharge:
 
     def fetch_coin_data(self, coin):
         current_utc_time = datetime.utcnow()
-        start_time_stamp, end_time_stamp = self.get_time_range(current_utc_time)
+        start_time_stamp, end_time_stamp = self.get_time_range_8h(current_utc_time)
         ret = self.bn.get_kline_data(coin['symbol'], "8h", start_time_stamp, end_time_stamp)
         if ret is None:
             return
 
         ret['timestamp'] = time.strftime("%Y-%m-%d %H:%M", time.localtime())
         self.rd.Publish("coin#binance#8h#" + coin['symbol'], json.dumps(ret))
+
+        start_time_stamp, end_time_stamp = self.get_time_range_1d(current_utc_time)
+        ret = self.bn.get_kline_data(coin['symbol'], "1d", start_time_stamp, end_time_stamp)
+        if ret is None:
+            return
+
+        ret['timestamp'] = time.strftime("%Y-%m-%d %H:%M", time.localtime())
+        self.rd.Publish("coin#binance#1d#" + coin['symbol'], json.dumps(ret))
+
+        start_time_stamp, end_time_stamp = self.get_time_range_1w(current_utc_time)
+        ret = self.bn.get_kline_data(coin['symbol'], "1w", start_time_stamp, end_time_stamp)
+        if ret is None:
+            return
+
+        ret['timestamp'] = time.strftime("%Y-%m-%d %H:%M", time.localtime())
+        self.rd.Publish("coin#binance#1w#" + coin['symbol'], json.dumps(ret))
+
+
+
 
     def fetch_assets(self, asset_list, fetch_func):
         while True:

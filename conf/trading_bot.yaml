@@ -25,6 +25,7 @@ binance:
   price: "/api/v3/ticker/price"
   order: "/api/v3/order"
   asset: "/sapi/v3/asset/getUserAsset"
+  earn_asset: "/sapi/v1/simple-earn/flexible/position"
 
 stock:
   url: "http://hq.sinajs.cn/list="

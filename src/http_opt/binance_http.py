@@ -67,5 +67,60 @@ class BinanceOpt:
         response = requests.post(url, headers=headers, data=query_params, proxies=self.proxies)
         if response.status_code == 200:
             data = response.json()
+        else:
+            return print(response.json())
 
         return data
+    
+    def get_earn_asset(self, api_key, api_secret):
+        url = self.gconf['url'] + self.gconf['earn_asset']
+        query_params = {
+            'timestamp': int(time.time() * 1000),
+            'recvWindow': 30000,
+            'size': 100,  # 每页结果数量，默认为10
+        }
+        query_params = self.get_signature(query_params, api_secret)
+        headers = {
+            'X-MBX-APIKEY': api_key
+        }
+
+        response = requests.get(
+            url, headers=headers, 
+            params=query_params, 
+            proxies=self.proxies
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+        else:
+            return print(response.json())
+        
+        return data
+
+    def sell_sopt_market(self, symbol, quantity, 
+            api_key, api_secret):
+        order_payload = {
+            "symbol": symbol,
+            "side": "SELL",
+            "type": "MARKET",
+            "quantity": quantity,
+            "timestamp": int(time.time() * 1000)
+        }
+        order_payload = self.get_signature(order_payload,api_secret)
+        url = self.gconf['url'] + self.gconf['order']
+        headers = {
+            'X-MBX-APIKEY': api_key
+        }
+
+        response = requests.post(url, headers=headers, data= order_payload, proxies=self.proxies)
+        if response.status_code == 200:
+            data = response.json()
+        else:
+            print(data)
+            return None
+        
+        return data
+        pass
+
+    def sell_sopt_limit(self, symbol, auantity, account_id):
+        pass

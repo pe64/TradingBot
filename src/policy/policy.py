@@ -58,7 +58,10 @@ class Policy:
         asset = self.get_asset_by_id(policy.asset_id)
         
         if asset['type'] == "coin":
-            subscribe_key = asset['type'] + "#" + asset['market'] + "#8h#" + asset['symbol']
+            subscribe_key = asset['type'] + "#" + \
+                            asset['market'] + "#" + \
+                            policy.period + "#" + \
+                            asset['symbol']
         else:
             subscribe_key = asset['type'] + "#" + asset['symbol']
         while True:
@@ -70,7 +73,7 @@ class Policy:
         if trade_message is None:
             return
         
-        self.redis_client.LPush("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
+        self.redis_client.Publish("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
         trade_back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id), 30)
 
         exe_policy.after_trade(trade_back)

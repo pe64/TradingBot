@@ -17,30 +17,65 @@ class BinanceCta:
             self.accounts["account_" + str(account['id'])] = account
             self.update_account(account['id'])
 
-    def get_binance_accounts(self):
+    def get_binance_accounts_num(self):
         return len(self.accounts)
     
     def binance_account_run(self, ids):
-        self.accounts[ids]['id']
-        message = self.redis_client.BRPop("left#trade#" + self.accounts[ids]['id'], 0)
-        order = json.loads(message)
-        if order['option'] == "SELL":
-            self.sell_asset(order)
-        elif order['option'] == "BUY":
-            self.buy_asset(order) 
+        account_id = self.accounts_db[ids]['id']
+        while True:
+            _, message = self.redis_client.Subscribe(
+                "left#trade#" + 
+                str(account_id)
+            )
+            order = json.loads(message)
+            if order['trade'] == "SELL":
+                self.sell_sopt_asset(order, account_id)
+            elif order['trade'] == "BUY":
+                self.buy_sopt_asset(order, account_id) 
+            else:
+                self.update_account(str(account_id))
     
-    def sell_asset(self, order):
+    def sell_sopt_asset(self, order, account_id):
+        if order['type'] == "asset":
+            self.bn.sell_sopt_market(order, account_id)
+        elif order['type'] == 'cash':
+            self.bn.sell_sopt_limit(order, account_id)
         pass
 
-    def buy_asset(self, order):
+    def buy_sopt_asset(self, order):
+        pass
+
+    def buy_feature_asset(self, order):
+        pass
+    
+    def sell_feature_asset(self, order):
         pass
 
     def update_account(self, account_id):
-        self.bn.get_user_asset(
+        account = {
+            "coin": {},
+            "earn": {},
+        }
+        message = self.bn.get_user_asset(
             self.accounts["account_" + str(account_id)]['API_KEY'], 
             self.accounts['account_' + str(account_id)]['API_SECRET'])
-        pass
 
-    
+        if message is not None:
+            for msg in message:
+                account['coin'][msg['asset']] = {
+                    "count" : msg['free']
+                }
 
-    
+        message = self.bn.get_earn_asset(
+            self.accounts["account_" + str(account_id)]['API_KEY'], 
+            self.accounts['account_' + str(account_id)]['API_SECRET'])
+        if message is not None and message['total'] > 0:
+            for msg in message['rows']:
+                account['earn'][msg['asset']] = {
+                    "count":msg['totalAmount'],
+                    "productId": msg['productId'],
+                    "canReem": msg['canRedeem']
+                }
+
+        self.accounts['account_' + str(account_id)]['asset'] = account
+        self.redis_client.Set("binance#" + str(account_id), json.dumps(account))
