@@ -18,37 +18,27 @@ class AssetCharge:
         self.rd = Redis(cf)
     
     @staticmethod
-    def get_time_range_1w(current_utc_time):
-        # 计算前7天的UTC时间
-        start_time = current_utc_time - timedelta(days=7)
-    
-        # 计算当前UTC时间
-        end_time = current_utc_time
-    
-        return start_time, end_time
-
-    @staticmethod
-    def get_time_range_1d(current_utc_time):
-        # 计算前一天的UTC 00:00时间
-        start_time = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)
-    
-        # 计算当前UTC时间
-        end_time = current_utc_time
-    
-        return start_time, end_time
-
-    @staticmethod
-    def get_time_range_8h(current_utc_time):
-        if 0 <= current_utc_time.hour < 8:
+    def calculate_time_range(current_utc_time, interval):
+        if interval == "8h":
+            # 计算当前8小时时间段的起始时间
+            start_time = current_utc_time.replace(minute=0, second=0, microsecond=0)
+            if current_utc_time.hour < 8:
+                start_time -= timedelta(hours=8)
+            end_time = current_utc_time
+        elif interval == "1d":
+            # 计算当天的起始时间
             start_time = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
-            end_time = start_time.replace(hour=8)
-        elif 8 <= current_utc_time.hour < 16:
-            start_time = current_utc_time.replace(hour=8, minute=0, second=0, microsecond=0)
-            end_time = start_time.replace(hour=16)
+            end_time = current_utc_time
+        elif interval == "1w":
+            # 计算本周起始时间
+            start_time = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
+            weekday = current_utc_time.weekday()  # 0表示周一，6表示周日
+            if weekday != 0:
+                start_time -= timedelta(days=weekday)
+            end_time = current_utc_time
         else:
-            start_time = current_utc_time.replace(hour=16, minute=0, second=0, microsecond=0)
-            end_time = start_time.replace(hour=0) + timedelta(days=1)
-        
+            raise ValueError("Unsupported interval")
+
         start_time_stamp = int(start_time.timestamp()) * 1000
         end_time_stamp = int(end_time.timestamp()) * 1000
         return start_time_stamp, end_time_stamp
@@ -74,31 +64,16 @@ class AssetCharge:
 
     def fetch_coin_data(self, coin):
         current_utc_time = datetime.utcnow()
-        start_time_stamp, end_time_stamp = self.get_time_range_8h(current_utc_time)
-        ret = self.bn.get_kline_data(coin['symbol'], "8h", start_time_stamp, end_time_stamp)
-        if ret is None:
-            return
+        intervals = ["8h", "1d", "1w"]
 
-        ret['timestamp'] = time.strftime("%Y-%m-%d %H:%M", time.localtime())
-        self.rd.Publish("coin#binance#8h#" + coin['symbol'], json.dumps(ret))
+        for interval in intervals:
+            start_time_stamp, end_time_stamp = self.calculate_time_range(current_utc_time, interval)
+            ret = self.bn.get_kline_data(coin['symbol'], interval, start_time_stamp, end_time_stamp)
+            if ret is None:
+                continue
 
-        start_time_stamp, end_time_stamp = self.get_time_range_1d(current_utc_time)
-        ret = self.bn.get_kline_data(coin['symbol'], "1d", start_time_stamp, end_time_stamp)
-        if ret is None:
-            return
-
-        ret['timestamp'] = time.strftime("%Y-%m-%d %H:%M", time.localtime())
-        self.rd.Publish("coin#binance#1d#" + coin['symbol'], json.dumps(ret))
-
-        start_time_stamp, end_time_stamp = self.get_time_range_1w(current_utc_time)
-        ret = self.bn.get_kline_data(coin['symbol'], "1w", start_time_stamp, end_time_stamp)
-        if ret is None:
-            return
-
-        ret['timestamp'] = time.strftime("%Y-%m-%d %H:%M", time.localtime())
-        self.rd.Publish("coin#binance#1w#" + coin['symbol'], json.dumps(ret))
-
-
+            ret['timestamp'] = time.strftime("%Y-%m-%d %H:%M", time.localtime())
+            self.rd.Publish(f"coin#binance#{interval}#{coin['symbol']}", json.dumps(ret))
 
 
     def fetch_assets(self, asset_list, fetch_func):

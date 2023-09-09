@@ -36,10 +36,23 @@ class BinanceCta:
                 self.update_account(str(account_id))
     
     def sell_sopt_asset(self, order, account_id):
+        api_key = self.accounts["account_" + str(account_id)]['API_KEY']
+        api_secret = self.accounts["account_" + str(account_id)]['API_SECRET']
         if order['type'] == "asset":
-            self.bn.sell_sopt_market(order, account_id)
+            self.bn.sell_sopt_market(
+                order['symbol'], 
+                order['count'], 
+                api_key, 
+                api_secret
+            )
         elif order['type'] == 'cash':
-            self.bn.sell_sopt_limit(order, account_id)
+            self.bn.sell_sopt_limit(
+                order['symbol'], 
+                order['count'], 
+                order['price'],
+                api_key, 
+                api_secret
+            )
         pass
 
     def buy_sopt_asset(self, order):
