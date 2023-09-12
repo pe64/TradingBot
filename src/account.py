@@ -9,11 +9,11 @@ if __name__ == "__main__":
     num = bn.get_binance_accounts_num()
     threads = []
 
-    def run_account(account_id):
+    def run_binance_account(account_id):
         bn.binance_account_run(account_id)
     
     for _ in range(num):
-        thread = threading.Thread(target=run_account, args=(_,))
+        thread = threading.Thread(target=run_binance_account, args=(_,))
         threads.append(thread)
 
     for thread in threads:

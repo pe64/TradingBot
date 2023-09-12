@@ -24,24 +24,20 @@ class AssetCharge:
             start_time = current_utc_time.replace(minute=0, second=0, microsecond=0)
             if current_utc_time.hour < 8:
                 start_time -= timedelta(hours=8)
-            end_time = current_utc_time
         elif interval == "1d":
             # 计算当天的起始时间
             start_time = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
-            end_time = current_utc_time
         elif interval == "1w":
             # 计算本周起始时间
             start_time = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
             weekday = current_utc_time.weekday()  # 0表示周一，6表示周日
             if weekday != 0:
                 start_time -= timedelta(days=weekday)
-            end_time = current_utc_time
         else:
             raise ValueError("Unsupported interval")
 
         start_time_stamp = int(start_time.timestamp()) * 1000
-        end_time_stamp = int(end_time.timestamp()) * 1000
-        return start_time_stamp, end_time_stamp
+        return start_time_stamp
 
     def fetch_fund_data(self, fund):
         ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['symbol'])
@@ -64,11 +60,15 @@ class AssetCharge:
 
     def fetch_coin_data(self, coin):
         current_utc_time = datetime.utcnow()
-        intervals = ["8h", "1d", "1w"]
+        intervals = [
+            "8h", 
+            "1d", 
+            "1w"
+        ]
 
         for interval in intervals:
-            start_time_stamp, end_time_stamp = self.calculate_time_range(current_utc_time, interval)
-            ret = self.bn.get_kline_data(coin['symbol'], interval, start_time_stamp, end_time_stamp)
+            start_time_stamp = self.calculate_time_range(current_utc_time, interval)
+            ret = self.bn.get_kline_data(coin['symbol'], interval, start_time_stamp)
             if ret is None:
                 continue
 

@@ -39,14 +39,14 @@ class BinanceCta:
         api_key = self.accounts["account_" + str(account_id)]['API_KEY']
         api_secret = self.accounts["account_" + str(account_id)]['API_SECRET']
         if order['type'] == "asset":
-            self.bn.sell_sopt_market(
+            self.bn.sell_market_order(
                 order['symbol'], 
                 order['count'], 
                 api_key, 
                 api_secret
             )
         elif order['type'] == 'cash':
-            self.bn.sell_sopt_limit(
+            self.bn.sell_limit_order(
                 order['symbol'], 
                 order['count'], 
                 order['price'],
@@ -55,7 +55,23 @@ class BinanceCta:
             )
         pass
 
-    def buy_sopt_asset(self, order):
+    def buy_sopt_asset(self, order, account_id):
+        api_key = self.accounts['account_' + str(account_id)]['API_KEY']
+        api_secret = self.accounts['account_' + str(account_id)]['API_SECRET']
+        if order['type'] == "asset":
+            self.bn.buy_market_order(
+                order['symbol'],
+                order['count'],
+                api_key,
+                api_secret
+            )
+        elif order['type'] == 'cash':
+            self.bn.buy_limit_order(
+                order['symbol'],
+                order['count'],
+                api_key,
+                api_secret
+            )
         pass
 
     def buy_feature_asset(self, order):
