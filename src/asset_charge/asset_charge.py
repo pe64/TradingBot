@@ -51,12 +51,12 @@ class AssetCharge:
                 "percent": ret["gszzl"],
                 "timestamp": ret["gztime"]
             }
-            self.rd.Publish("fund#" + fund['symbol'], json.dumps(charge))
+            self.rd.Publish("fund#1d#" + fund['symbol'], json.dumps(charge))
 
     def fetch_stock_data(self, stock):
         ret = self.stock.get_stock_charge(stock['symbol'], stock['market'])
         if ret is not None:
-            self.rd.Publish("stock#" + stock['symbol'], json.dumps(ret))
+            self.rd.Publish("stock#1d#" + stock['symbol'], json.dumps(ret))
 
     def fetch_coin_data(self, coin):
         current_utc_time = datetime.utcnow()

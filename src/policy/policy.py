@@ -63,9 +63,15 @@ class Policy:
                             policy.period + "#" + \
                             asset['symbol']
         else:
-            subscribe_key = asset['type'] + "#" + asset['symbol']
+            subscribe_key = asset['type'] + "#" + \
+                            policy.period + '#' + \
+                            asset['symbol']
         while True:
-            self.redis_client.PSubscribe(subscribe_key, policy, callback=self.charge_callback)
+            self.redis_client.PSubscribe(
+                subscribe_key, 
+                policy, 
+                callback=self.charge_callback
+            )
 
     def charge_callback(self, channel, charge, exe_policy):
 

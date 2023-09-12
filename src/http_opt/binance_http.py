@@ -115,7 +115,7 @@ class BinanceOpt:
             'symbol': symbol,
             'side': 'SELL',
             'type': 'LIMIT',
-            'timeInForce': 'GTC',
+            'timeInForce': 'FOK',
             'quantity': quantity,
             'price': price,
             'timestamp': int(time.time() * 1000)
@@ -127,7 +127,7 @@ class BinanceOpt:
             'symbol': symbol,
             'side': 'BUY',
             'type': 'LIMIT',
-            'timeInForce': 'GTC',
+            'timeInForce': 'FOK',
             'quantity': quantity,
             'price': price,
             'timestamp': int(time.time() * 1000)
