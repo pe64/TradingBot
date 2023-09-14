@@ -1,6 +1,6 @@
 import threading
 
-from conf.yaml_conf import yaml_load
+from utils.yaml_conf import yaml_load
 from cta.binance_cta import BinanceCta
 
 if __name__ == "__main__":
