@@ -81,6 +81,26 @@ class Policy:
         
         self.redis_client.Publish("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
         trade_back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id), 30)
+        if trade_back is None:
+            return
 
-        exe_policy.after_trade(trade_back)
+        policy_change = exe_policy.after_trade(trade_back)
+        if policy_change is None:
+            return
+
+        self.redis_client.LPush("policy#database", json.loads(policy_change))
+    
+    def monit_database(self):
+        while True:
+            policy_change = self.redis_client.BRPop("policy#database", 60)
+            policy = json.dumps(policy_change)
+
+            self.policy_db.update_policy_status(
+                policy['id'], 
+                policy['cash_inuse'], 
+                policy['cash'], 
+                policy['asset_count'],
+                policy['timestamp'],
+                json.dumps(policy['condition'])
+            )
         

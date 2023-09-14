@@ -58,6 +58,8 @@ class BinanceOpt:
             ret["high"] = kline_data[0][2]
             ret["low"] = kline_data[0][3]
             ret["volume"]= kline_data[0][5]
+        else:
+            return None
                 
         params_price = {
             "symbol": symbol

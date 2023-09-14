@@ -4,3 +4,4 @@ if __name__ == "__main__":
     cf = yaml_load()
     po = Policy(cf)
     po.run_policies_in_thread()
+    po.monit_database()

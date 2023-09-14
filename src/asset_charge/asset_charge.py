@@ -38,6 +38,15 @@ class AssetCharge:
 
         start_time_stamp = int(start_time.timestamp()) * 1000
         return start_time_stamp
+    
+    @staticmethod
+    def transform_datatime_format(input_str):
+        if len(input_str) == 19:  # 格式 "YYYY-MM-DD HH:MM:SS"
+            dt_format = "%Y-%m-%d %H:%M:%S"
+        else:  # 格式 "YYYY-MM-DD HH:MM"
+            dt_format = "%Y-%m-%d %H:%M"
+        dt = datetime.strptime(input_str, dt_format)
+        return dt.strftime("%Y%m%d%H%M%S")
 
     def fetch_fund_data(self, fund):
         ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['symbol'])
@@ -49,14 +58,31 @@ class AssetCharge:
                 "close": ret['dwjz'],
                 "cur": ret['gsz'],
                 "percent": ret["gszzl"],
-                "timestamp": ret["gztime"]
+                "timestamp": self.transform_datatime_format(ret["gztime"])
             }
             self.rd.Publish("fund#1d#" + fund['symbol'], json.dumps(charge))
 
+
     def fetch_stock_data(self, stock):
-        ret = self.stock.get_stock_charge(stock['symbol'], stock['market'])
-        if ret is not None:
-            self.rd.Publish("stock#1d#" + stock['symbol'], json.dumps(ret))
+        stock_info = self.stock.get_stock_charge(stock['symbol'], stock['market'])
+        if stock_info is None:
+            return
+
+        data =  {
+            "symbol": stock['symbol'],
+            "name": stock_info[0],
+            "open": float(stock_info[1]),
+            "close": float(stock_info[2]),
+            "cur": float(stock_info[3]),
+            "high": float(stock_info[4]),
+            "low": float(stock_info[5]),
+            "percent": round((float(stock_info[3]) - float(stock_info[2])) / float(stock_info[2]) * 100, 2),
+            "volume": int(stock_info[8]),
+            "timestamp": self.transform_datatime_format(stock_info[30] + " " + stock_info[31])
+        }
+
+        self.rd.Publish("stock#1d#" + stock['symbol'], json.dumps(data))
+        return
 
     def fetch_coin_data(self, coin):
         current_utc_time = datetime.utcnow()
@@ -71,9 +97,9 @@ class AssetCharge:
             ret = self.bn.get_kline_data(coin['symbol'], interval, start_time_stamp)
             if ret is None:
                 continue
-
-            ret['timestamp'] = time.strftime("%Y-%m-%d %H:%M", time.localtime())
-            self.rd.Publish(f"coin#binance#{interval}#{coin['symbol']}", json.dumps(ret))
+            else:
+                ret['timestamp'] = time.strftime("%Y%m%d%H%M%S", time.localtime())
+                self.rd.Publish(f"coin#binance#{interval}#{coin['symbol']}", json.dumps(ret))
 
 
     def fetch_assets(self, asset_list, fetch_func):
