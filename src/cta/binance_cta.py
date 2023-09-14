@@ -1,6 +1,6 @@
 import json
 
-from redis_opt.redis import Redis
+from utils.redis import Redis
 from db.account_db import AccountDB
 from http_opt.binance_http import BinanceOpt
 
@@ -68,7 +68,8 @@ class BinanceCta:
         elif order['type'] == 'cash':
             self.bn.buy_limit_order(
                 order['symbol'],
-                order['count'],
+                order['count'] / order['price'],
+                order['price'],
                 api_key,
                 api_secret
             )

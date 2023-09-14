@@ -1,7 +1,7 @@
 import json
 import threading
 
-from redis_opt.redis import Redis
+from utils.redis import Redis
 from locale import currency
 
 from db.policy_db import PolicyDB
@@ -10,7 +10,7 @@ from db.asset_db import AssetDB
 from policy.martin import Martin
 from policy.balance import Balance
 from policy.gerd import Gerd
-from policy.autobuy import AutoBuy
+from policy.auto_buy import AutoBuy
 from policy.open import OpenPst
 from policy.bond import Bond
 from policy.auto_sale import AutoSale

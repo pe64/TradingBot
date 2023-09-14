@@ -11,7 +11,6 @@ class AutoSale:
         self.asset_count = float(policy_config['asset_count'])
         self.condition = policy_config['condition']
         self.timestamp = policy_config['timestamp']
-        pass
 
     @staticmethod
     def check_sell_condition(close, cur, asset_count, sell_count):
@@ -28,7 +27,7 @@ class AutoSale:
 
         ret = {
             'symbol': charge['symbol'],
-            'type': 'cash',
+            'type': self.condition['type'],
             "trade": "SELL",
             "price": charge['cur'],
             'quantity': self.condition['count']

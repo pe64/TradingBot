@@ -15,7 +15,7 @@ from cta.virtual_cta import VirtualCta
 from http_opt.fund51_http import HttpFund51
 from http_opt.eastmoney import HttpEM
 from cta.eastmoney_cta import EastMoneyCta
-from redis_opt.redis import Redis
+from utils.redis import Redis
 from http_opt.binance_http import BinanceOpt
 from ocr.ocr import *
 

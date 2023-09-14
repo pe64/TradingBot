@@ -3,11 +3,12 @@ from datetime import datetime, timedelta
 import json
 from db.asset_db import AssetDB
 from http_opt.fund_http import fund_http_real_time_charge
-from redis_opt.redis import Redis
+from utils.redis import Redis
 from http_opt.binance_http import BinanceOpt
 from stock.stock_charge import StockCharge
 import threading
 from conf.yaml_conf import yaml_load
+from utils.time_format import TimeFormat
 
 class AssetCharge:
     def __init__(self, cf):
@@ -17,37 +18,6 @@ class AssetCharge:
         self.stock = StockCharge(cf)
         self.rd = Redis(cf)
     
-    @staticmethod
-    def calculate_time_range(current_utc_time, interval):
-        if interval == "8h":
-            # 计算当前8小时时间段的起始时间
-            start_time = current_utc_time.replace(minute=0, second=0, microsecond=0)
-            if current_utc_time.hour < 8:
-                start_time -= timedelta(hours=8)
-        elif interval == "1d":
-            # 计算当天的起始时间
-            start_time = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
-        elif interval == "1w":
-            # 计算本周起始时间
-            start_time = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
-            weekday = current_utc_time.weekday()  # 0表示周一，6表示周日
-            if weekday != 0:
-                start_time -= timedelta(days=weekday)
-        else:
-            raise ValueError("Unsupported interval")
-
-        start_time_stamp = int(start_time.timestamp()) * 1000
-        return start_time_stamp
-    
-    @staticmethod
-    def transform_datatime_format(input_str):
-        if len(input_str) == 19:  # 格式 "YYYY-MM-DD HH:MM:SS"
-            dt_format = "%Y-%m-%d %H:%M:%S"
-        else:  # 格式 "YYYY-MM-DD HH:MM"
-            dt_format = "%Y-%m-%d %H:%M"
-        dt = datetime.strptime(input_str, dt_format)
-        return dt.strftime("%Y%m%d%H%M%S")
-
     def fetch_fund_data(self, fund):
         ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['symbol'])
         if ret is not None:
@@ -58,7 +28,7 @@ class AssetCharge:
                 "close": ret['dwjz'],
                 "cur": ret['gsz'],
                 "percent": ret["gszzl"],
-                "timestamp": self.transform_datatime_format(ret["gztime"])
+                "timestamp": TimeFormat.transform_datatime_format(ret["gztime"])
             }
             self.rd.Publish("fund#1d#" + fund['symbol'], json.dumps(charge))
 
@@ -78,7 +48,7 @@ class AssetCharge:
             "low": float(stock_info[5]),
             "percent": round((float(stock_info[3]) - float(stock_info[2])) / float(stock_info[2]) * 100, 2),
             "volume": int(stock_info[8]),
-            "timestamp": self.transform_datatime_format(stock_info[30] + " " + stock_info[31])
+            "timestamp": TimeFormat.transform_datatime_format(stock_info[30] + " " + stock_info[31])
         }
 
         self.rd.Publish("stock#1d#" + stock['symbol'], json.dumps(data))
@@ -93,7 +63,7 @@ class AssetCharge:
         ]
 
         for interval in intervals:
-            start_time_stamp = self.calculate_time_range(current_utc_time, interval)
+            start_time_stamp = TimeFormat.calculate_time_range(current_utc_time, interval)
             ret = self.bn.get_kline_data(coin['symbol'], interval, start_time_stamp)
             if ret is None:
                 continue
