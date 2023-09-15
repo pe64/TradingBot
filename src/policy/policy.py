@@ -75,16 +75,22 @@ class Policy:
 
     def charge_callback(self, channel, charge, exe_policy):
 
-        trade_message = exe_policy.execult(json.loads(charge))
+        trade_message = exe_policy.execute(json.loads(charge))
         if trade_message is None:
             return
         
         self.redis_client.Publish("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
-        trade_back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id), 30)
-        if trade_back is None:
-            return
+        back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id), 30)
+        trace_back = {'result': True}
 
-        policy_change = exe_policy.after_trade(trade_back)
+        if back is None:
+            trace_back['result'] = False
+
+        trace_back['asset_num'] = back['asset_num']
+        trace_back['balance'] = back['balance']
+        trace_back['cost_money'] = back['cost_money']
+
+        policy_change = exe_policy.after_trade(trace_back)
         if policy_change is None:
             return
 
@@ -93,8 +99,10 @@ class Policy:
     def monit_database(self):
         while True:
             policy_change = self.redis_client.BRPop("policy#database", 60)
-            policy = json.dumps(policy_change)
+            if policy_change is None:
+                continue
 
+            policy = json.dumps(policy_change)
             self.policy_db.update_policy_status(
                 policy['id'], 
                 policy['cash_inuse'], 

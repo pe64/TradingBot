@@ -9,7 +9,7 @@ class PolicyDB:
     
     def get_policys(self):
         res = []
-        self.cur.execute('SELECT id, account_id, type, asset_id, cash, cash_into, cash_inuse, asset_count, timestamp, condition FROM policy WHERE enabled == 1')
+        self.cur.execute('SELECT id, account_id, type, asset_id, cash, cash_into, cash_inuse, asset_count, timestamp, condition, execution_time FROM policy WHERE enabled == 1')
         rows = self.cur.fetchall()
         for row in rows:
             res.append({
@@ -22,7 +22,8 @@ class PolicyDB:
                 "cash_inuse": row[6],
                 "asset_count": row[7],
                 "timestamp": row[8],
-                "condition": json.loads(row[9])
+                "condition": json.loads(row[9]),
+                "execute": json.loads(row[10])
             })
         return res
 

@@ -1,4 +1,5 @@
 import json
+from utils.time_format import TimeFormat
 
 class AutoSale:
     def __init__(self, policy_config) -> None:
@@ -11,12 +12,13 @@ class AutoSale:
         self.asset_count = float(policy_config['asset_count'])
         self.condition = policy_config['condition']
         self.timestamp = policy_config['timestamp']
+        self.execute_time = policy_config['execute_time']
 
     @staticmethod
     def check_sell_condition(close, cur, asset_count, sell_count):
         return cur > close and asset_count > sell_count
     
-    def execult(self, charge):
+    def execute(self, charge):
         if self.check_sell_condition(
                 float(charge['close']), 
                 float(charge['cur']), 
@@ -35,10 +37,12 @@ class AutoSale:
         return ret
     
     def after_trade(self, trade_back):
+        if trade_back['result'] is True:
+            self.timestamp = TimeFormat.get_current_timestamp_format()
         policy = {
             "id": self.policy_id,
             "cash_inuse": self.cash_inuse,
-            "cash": self.cash,
+            "cash": self.cash - self.condition['count']  + trade_back['balance'],
             "asset_count":self.asset_count,
             "timestamp": self.timestamp
         }

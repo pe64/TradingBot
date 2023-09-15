@@ -4,11 +4,14 @@ class AutoBuy:
     def __init__(self, js) -> None:
         self.policy_id = js["id"]
         self.asset_id = js["asset_id"]
-        self.cash = js["cash"]
-        self.percent = js["percent"]
-        self.buy_counts = js["buy_count"]
+        self.cash = float(js["cash"])
         self.asset_count = js["asset_count"]
         self.condition = js['condition']
+        self.execute_time = js['execute_time']
+        self.period = js['condition']['period']
+        self.timestamp = js['timestamp']
+        #self.buy_counts = js["buy_count"]
+        #self.percent = js["percent"]
         #self.aver_charge = 0.0
         #self.start_charge = 0.0
         #self.start_amount = self.cash
@@ -38,9 +41,10 @@ class AutoBuy:
     def check_buy_condition(self, cur, close, cash, buy_count, 
                 cur_timestamp, last_timestamp, period):
 
-        timedelta = TimeFormat.get_delta_time(period)
+        timedelta = TimeFormat.get_time_delta(period)
         timediff = TimeFormat.calculate_time_difference(last_timestamp, cur_timestamp)
-        return cur < close and cash > buy_count and timediff > timedelta
+        timerange = TimeFormat.is_within_configured_time(self.execute_time, cur_timestamp)
+        return cur < close and cash > buy_count and timediff > timedelta and timerange and timerange
 
     def execute(self, charge):
 
@@ -50,7 +54,8 @@ class AutoBuy:
             self.cash, 
             self.condition['count'], 
             charge['timestamp'], 
-            self.timestamp
+            self.timestamp,
+            self.period
         ) is False:
             return None
         
@@ -68,8 +73,8 @@ class AutoBuy:
         policy = {
             'id': self.policy_id,
             'cash_inuse': self.cash_inuse,
-            'cash': self.cash,
-            'asset_count': self.asset_count,
+            'cash': self.cash - trade_back['balance'],
+            'asset_count': self.asset_count + trade_back['asset_count'],
             'timestamp': self.timestamp
         }
         return policy

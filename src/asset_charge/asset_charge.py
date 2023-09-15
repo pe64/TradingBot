@@ -24,10 +24,10 @@ class AssetCharge:
             charge = {
                 "symbol": ret["fundcode"],
                 "name": ret["name"],
-                "open": ret['dwjz'],
-                "close": ret['dwjz'],
-                "cur": ret['gsz'],
-                "percent": ret["gszzl"],
+                "open": float(ret['dwjz']),
+                "close": float(ret['dwjz']),
+                "cur": float(ret['gsz']),
+                "percent": float(ret["gszzl"]),
                 "timestamp": TimeFormat.transform_datatime_format(ret["gztime"])
             }
             self.rd.Publish("fund#1d#" + fund['symbol'], json.dumps(charge))

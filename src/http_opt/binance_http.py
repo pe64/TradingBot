@@ -52,11 +52,11 @@ class BinanceOpt:
         if kline_data and len(kline_data) > 0:
             ret["symbol"] = symbol
             ret["name"] = symbol
-            ret["open"] = kline_data[0][1]
-            ret["close"]= kline_data[0][4]
-            ret["cur"]= kline_data[0][4]
-            ret["high"] = kline_data[0][2]
-            ret["low"] = kline_data[0][3]
+            ret["open"] = float(kline_data[0][1])
+            ret["close"]= float(kline_data[0][1])
+            ret["cur"]= float(kline_data[0][4])
+            ret["high"] = float(kline_data[0][2])
+            ret["low"] = float(kline_data[0][3])
             ret["volume"]= kline_data[0][5]
         else:
             return None
@@ -67,7 +67,7 @@ class BinanceOpt:
         price_data = self.get_request(self.gconf['url'] + self.gconf['price'], params=params_price)
         
         if price_data and len(price_data) > 0:
-            ret["cur"] = price_data["price"]
+            ret["cur"] = float(price_data["price"])
         
         return ret
 

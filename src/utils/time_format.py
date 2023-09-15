@@ -61,3 +61,52 @@ class TimeFormat:
             return timedelta(days=6, hours=23, minutes=59)
         else:
             return timedelta(minutes=1)
+    
+    @staticmethod
+    def get_current_timestamp_format():
+        timestamp = time.time()
+        formatted_time = datetime.fromtimestamp(timestamp)
+        formatted_str = formatted_time.strftime("%Y%m%d%H%M%S")
+        return formatted_str
+    
+    @staticmethod
+    def parse_time(time_info, target_time_str):
+        try:
+            hour = time_info.get("hour", 0)
+            minute = time_info.get("min", 0)
+            # 解析目标时间字符串的年、月、日
+            year = int(target_time_str[0:4])
+            month = int(target_time_str[4:6])
+            day = int(target_time_str[6:8])
+            return datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=0)
+        except (KeyError, ValueError):
+            return None
+
+    @staticmethod
+    def is_within_configured_time(config, target_time_str):
+        try:
+            # 解析目标时间字符串
+            target_time = datetime.strptime(target_time_str, "%Y%m%d%H%M%S")
+
+            if "start_time" in config:
+                start_time = TimeFormat.parse_time(config["start_time"], target_time_str)
+                if start_time is None:
+                    return False
+
+                if "week_day" in config["start_time"]:
+                    week_day = config["start_time"]["week_day"].lower()
+                    if week_day != target_time.strftime("%A").lower():
+                        return False
+
+            if "end_time" in config:
+                end_time = TimeFormat.parse_time(config["end_time"], target_time_str)
+                if end_time is None:
+                    return False
+
+            if "start_time" in config and "end_time" in config:
+                if start_time <= target_time <= end_time:
+                    return True
+
+            return False
+        except (KeyError, ValueError):
+            return False  # 配置信息无效或缺失时返回False
