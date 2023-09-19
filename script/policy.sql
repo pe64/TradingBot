@@ -31,7 +31,7 @@ CREATE TABLE "policy" (
   , condition TEXT
   , asset_count TEXT DEFAULT(0)
   , timestamp TEXT
-  , execute_time TEXT
+  , execution_time TEXT
 );
 
 PRAGMA foreign_keys = true;
