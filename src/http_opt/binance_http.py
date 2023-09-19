@@ -111,7 +111,7 @@ class BinanceOpt:
             "side": "SELL",
             "type": "MARKET",
             "quantity": quantity,
-            "newOrderRespType": "FULL",
+            "newOrderRespType": "RESULT",
             "timestamp": int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
@@ -124,7 +124,7 @@ class BinanceOpt:
             'timeInForce': 'FOK',
             'quantity': quantity,
             'price': price,
-            "newOrderRespType": "FULL",
+            "newOrderRespType": "RESULT",
             'timestamp': int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
@@ -137,7 +137,7 @@ class BinanceOpt:
             'timeInForce': 'FOK',
             'quantity': quantity,
             'price': price,
-            "newOrderRespType": "FULL",
+            "newOrderRespType": "RESULT",
             'timestamp': int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
@@ -148,7 +148,7 @@ class BinanceOpt:
             'side': 'BUY',
             'type': 'MARKET',
             'quantity': quantity,
-            "newOrderRespType": "FULL",
+            "newOrderRespType": "RESULT",
             'timestamp': int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
