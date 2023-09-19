@@ -83,6 +83,9 @@ class BinanceOpt:
         if query_params:
             query_params = self.get_signature(query_params, api_secret)
         
+        if data:
+            data = self.get_signature(data, api_secret)
+        
         return self._make_request(method, url, headers=headers, params=query_params, data=data)
 
     def get_user_asset(self, api_key, api_secret):
@@ -91,7 +94,7 @@ class BinanceOpt:
             'timestamp': int(time.time() * 1000),
             'recvWindow': 30000
         }
-        return self._make_signed_request("GET", url, api_key, api_secret, query_params=query_params)
+        return self._make_signed_request("POST", url, api_key, api_secret, data=query_params)
 
     def get_earn_asset(self, api_key, api_secret):
         url = self.gconf['url'] + self.gconf['earn_asset']
@@ -108,6 +111,7 @@ class BinanceOpt:
             "side": "SELL",
             "type": "MARKET",
             "quantity": quantity,
+            "newOrderRespType": "FULL",
             "timestamp": int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
@@ -120,6 +124,7 @@ class BinanceOpt:
             'timeInForce': 'FOK',
             'quantity': quantity,
             'price': price,
+            "newOrderRespType": "FULL",
             'timestamp': int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
@@ -132,6 +137,7 @@ class BinanceOpt:
             'timeInForce': 'FOK',
             'quantity': quantity,
             'price': price,
+            "newOrderRespType": "FULL",
             'timestamp': int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
@@ -142,6 +148,7 @@ class BinanceOpt:
             'side': 'BUY',
             'type': 'MARKET',
             'quantity': quantity,
+            "newOrderRespType": "FULL",
             'timestamp': int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
