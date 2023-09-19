@@ -78,9 +78,9 @@ class Policy:
         trade_message = exe_policy.execute(json.loads(charge))
         if trade_message is None:
             return
-        
+        trade_message['policy_id'] = exe_policy.policy_id
         self.redis_client.Publish("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
-        back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id), 30)
+        back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 30)
         trace_back = {'result': True}
 
         if back is None:

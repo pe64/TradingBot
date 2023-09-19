@@ -36,44 +36,64 @@ class BinanceCta:
                 self.update_account(str(account_id))
     
     def sell_sopt_asset(self, order, account_id):
+        order_msg = {}
         api_key = self.accounts["account_" + str(account_id)]['API_KEY']
         api_secret = self.accounts["account_" + str(account_id)]['API_SECRET']
         if order['type'] == "asset":
-            self.bn.sell_market_order(
+            order_msg = self.bn.sell_market_order(
                 order['symbol'], 
-                order['count'], 
+                order['quantity'], 
                 api_key, 
                 api_secret
             )
         elif order['type'] == 'cash':
-            self.bn.sell_limit_order(
+            order_msg = self.bn.sell_limit_order(
                 order['symbol'], 
-                order['count'], 
+                order['quantity'], 
                 order['price'],
                 api_key, 
                 api_secret
             )
-        pass
+        
+        if order_msg is not None:
+            ret_msg = {
+                "status": order_msg['status'],
+                "orderId": order_msg['orderId'],
+                "origQty": order_msg['origQty'],
+                "executedQty": order_msg['executedQty'],
+                "cummulativeQuoteQty": order_msg['cummulativeQuoteQty']
+            }
+            self.redis_client.LPush("right#trade#" + str(account_id) + "#" + str(order['policy_id']), json.dumps(ret_msg))
 
     def buy_sopt_asset(self, order, account_id):
+        order_msg = {}
         api_key = self.accounts['account_' + str(account_id)]['API_KEY']
         api_secret = self.accounts['account_' + str(account_id)]['API_SECRET']
         if order['type'] == "asset":
-            self.bn.buy_market_order(
+            order_msg = self.bn.buy_market_order(
                 order['symbol'],
-                order['count'],
+                order['quantity'],
                 api_key,
                 api_secret
             )
         elif order['type'] == 'cash':
-            self.bn.buy_limit_order(
+            order_msg = self.bn.buy_limit_order(
                 order['symbol'],
-                order['count'] / order['price'],
+                order['quantity'] / order['price'],
                 order['price'],
                 api_key,
                 api_secret
             )
-        pass
+
+        if order_msg is not None:
+            ret_msg = {
+                "status": order_msg['status'],
+                "orderId": order_msg['orderId'],
+                "origQty": order_msg['origQty'],
+                "executedQty": order_msg['executedQty'],
+                "cummulativeQuoteQty": order_msg['cummulativeQuoteQty']
+            }
+            self.redis_client.LPush("right#trade#" + str(account_id) + "#" + str(order['policy_id']), json.dumps(ret_msg))
 
     def buy_feature_asset(self, order):
         pass

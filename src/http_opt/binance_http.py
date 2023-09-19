@@ -112,6 +112,7 @@ class BinanceOpt:
             "type": "MARKET",
             "quantity": quantity,
             "newOrderRespType": "RESULT",
+            'recvWindow': 30000,
             "timestamp": int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
@@ -125,6 +126,7 @@ class BinanceOpt:
             'quantity': quantity,
             'price': price,
             "newOrderRespType": "RESULT",
+            'recvWindow': 30000,
             'timestamp': int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
@@ -138,6 +140,7 @@ class BinanceOpt:
             'quantity': quantity,
             'price': price,
             "newOrderRespType": "RESULT",
+            'recvWindow': 30000,
             'timestamp': int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
@@ -149,6 +152,7 @@ class BinanceOpt:
             'type': 'MARKET',
             'quantity': quantity,
             "newOrderRespType": "RESULT",
+            'recvWindow': 30000,
             'timestamp': int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
