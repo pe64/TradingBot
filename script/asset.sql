@@ -22,5 +22,7 @@ INSERT INTO asset(id, symbol, name, type, market) VALUES(10, 'SOLUSDT', 'SOLUSDT
 INSERT INTO asset(id, symbol, name, type, market) VALUES(11, 'BTCUSDT', 'BTCUSDT', 'coin', 'binance');
 INSERT INTO asset(id, symbol, name, type, market) VALUES(12, 'ETHUSDT', 'ETHUSDT', 'coin', 'binance');
 INSERT INTO asset(id, symbol, name, type, market) VALUES(13, 'LTCUSDT', 'LTCUSDT', 'coin', 'binance');
+INSERT INTO asset(id, symbol, name, type, market) VALUES(14, 'SOLUSDT', 'SOLUSDT', 'coin', 'binance');
+INSERT INTO asset(id, symbol, name, type, market) VALUES(15, 'WLDUSDT', 'WLDUSDT', 'coin', 'binance');
 
 COMMIT;
