@@ -23,7 +23,7 @@ class PolicyDB:
                 "asset_count": row[7],
                 "timestamp": row[8],
                 "condition": json.loads(row[9]),
-                "execute": json.loads(row[10])
+                "execute_time": json.loads(row[10])
             })
         return res
 

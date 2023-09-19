@@ -44,7 +44,7 @@ class AutoBuy:
         timedelta = TimeFormat.get_time_delta(period)
         timediff = TimeFormat.calculate_time_difference(last_timestamp, cur_timestamp)
         timerange = TimeFormat.is_within_configured_time(self.execute_time, cur_timestamp)
-        return cur < close and cash > buy_count and timediff > timedelta and timerange and timerange
+        return cur < close and cash > buy_count and timediff > timedelta and timerange 
 
     def execute(self, charge):
 

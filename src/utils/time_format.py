@@ -72,12 +72,21 @@ class TimeFormat:
     @staticmethod
     def parse_time(time_info, target_time_str):
         try:
-            hour = time_info.get("hour", 0)
-            minute = time_info.get("min", 0)
+            # 从time_info字典中获取"time"键的值，格式为"HH:MM"
+            time_str = time_info.get("time")
+            
+            if not time_str:
+                raise ValueError("Invalid time format")
+
             # 解析目标时间字符串的年、月、日
             year = int(target_time_str[0:4])
             month = int(target_time_str[4:6])
             day = int(target_time_str[6:8])
+
+            # 解析时间字符串，获取小时和分钟
+            hour, minute = map(int, time_str.split(':'))
+
+            # 创建datetime对象
             return datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=0)
         except (KeyError, ValueError):
             return None
