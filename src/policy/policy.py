@@ -2,6 +2,7 @@ import json
 import threading
 
 from utils.redis import Redis
+from utils.time_format import TimeFormat
 from locale import currency
 
 from db.policy_db import PolicyDB
@@ -80,17 +81,11 @@ class Policy:
             return
         trade_message['policy_id'] = exe_policy.policy_id
         self.redis_client.Publish("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
-        back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 30)
-        trace_back = {'result': True}
-
+        back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 120)
         if back is None:
-            trace_back['result'] = False
-
-        trace_back['asset_num'] = back['asset_num']
-        trace_back['balance'] = back['balance']
-        trace_back['cost_money'] = back['cost_money']
-
-        policy_change = exe_policy.after_trade(trace_back)
+            return 
+        back['timestamp'] = TimeFormat.get_current_timestamp_format()
+        policy_change = exe_policy.after_trade(back)
         if policy_change is None:
             return
 

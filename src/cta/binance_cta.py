@@ -85,15 +85,21 @@ class BinanceCta:
                 api_secret
             )
 
-        if order_msg is not None:
-            ret_msg = {
-                "status": order_msg['status'],
-                "orderId": order_msg['orderId'],
-                "origQty": order_msg['origQty'],
-                "executedQty": order_msg['executedQty'],
-                "cummulativeQuoteQty": order_msg['cummulativeQuoteQty']
-            }
-            self.redis_client.LPush("right#trade#" + str(account_id) + "#" + str(order['policy_id']), json.dumps(ret_msg))
+        ret_msg = {"status":"EXPIRED"}
+        push_key = "right#trade#" + str(account_id) + "#" + str(order['policy_id'])
+
+        if order_msg is None:
+            self.redis_client.LPush(push_key, json.dumps(ret_msg))
+            return
+
+        ret_msg = {
+            "status": order_msg['status'],
+            "orderId": order_msg['orderId'],
+            "origQty": order_msg['origQty'],
+            "executedQty": order_msg['executedQty'],
+            "cummulativeQuoteQty": order_msg['cummulativeQuoteQty']
+        }
+        self.redis_client.LPush(push_key, json.dumps(ret_msg))
 
     def buy_feature_asset(self, order):
         pass
