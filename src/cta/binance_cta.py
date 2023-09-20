@@ -12,10 +12,21 @@ class BinanceCta:
         self.accounts = {}
         self.accounts_db = self.db.get_binance_accounts()
         self.redis_client = Redis(config)
+        self.exchange_info = {}
 
         for account in self.accounts_db:
             self.accounts["account_" + str(account['id'])] = account
             self.update_account(account['id'])
+        
+        info = self.bn.get_exchange_info()
+
+        for symbol_info in info['symbols']:
+            if "filters" in symbol_info:
+                for filter in symbol_info['filters']:
+                    symbol_info[filter['filterType']] = filter
+            self.exchange_info[symbol_info['symbol']] = symbol_info
+        pass
+
 
     def get_binance_accounts_num(self):
         return len(self.accounts)
@@ -34,7 +45,21 @@ class BinanceCta:
                 self.buy_sopt_asset(order, account_id) 
             else:
                 self.update_account(str(account_id))
-    
+
+    def round_quantity(self, symbol, quantity, price):
+        if symbol in self.exchange_info and 'quoteAssetPrecision' in self.exchange_info[symbol]:
+            quote_asset_precision = int(self.exchange_info[symbol]['quoteAssetPrecision'])
+            original_quantity = quantity / price
+
+            # Check if LOT_SIZE filter exists
+            if "LOT_SIZE" in self.exchange_info[symbol]:
+                min_qty = float(self.exchange_info[symbol]['LOT_SIZE']['minQty'])
+                original_quantity = round(original_quantity / min_qty) * min_qty
+
+            return round(original_quantity, quote_asset_precision)
+
+        return None   
+
     def sell_sopt_asset(self, order, account_id):
         order_msg = {}
         api_key = self.accounts["account_" + str(account_id)]['API_KEY']
@@ -47,9 +72,10 @@ class BinanceCta:
                 api_secret
             )
         elif order['type'] == 'cash':
+            quantity = self.round_quantity(order['symbol'], order['quantity'], order['price'])
             order_msg = self.bn.sell_limit_order(
                 order['symbol'], 
-                order['quantity'], 
+                quantity, 
                 order['price'],
                 api_key, 
                 api_secret
@@ -77,9 +103,10 @@ class BinanceCta:
                 api_secret
             )
         elif order['type'] == 'cash':
+            quantity = self.round_quantity(order['symbol'], order['quantity'], order['price'])
             order_msg = self.bn.buy_limit_order(
                 order['symbol'],
-                order['quantity'] / order['price'],
+                quantity,
                 order['price'],
                 api_key,
                 api_secret

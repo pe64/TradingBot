@@ -4,6 +4,7 @@ class AutoBuy:
     def __init__(self, js) -> None:
         self.policy_id = js["id"]
         self.asset_id = js["asset_id"]
+        self.account_id = js['account_id']
         self.cash = float(js["cash"])
         self.asset_count = float(js["asset_count"])
         self.condition = js['condition']
@@ -49,9 +50,9 @@ class AutoBuy:
             return None
 
         self.timestamp = trade_back['timestamp']
-        self.cash_inuse = self.cash_inuse + trade_back['cummulativeQuoteQty']
-        self.cash = self.cash - trade_back['cummulativeQuoteQty']
-        self.asset_count = self.asset_count + trade_back['executedQty']
+        self.cash_inuse = self.cash_inuse + float(trade_back['cummulativeQuoteQty'])
+        self.cash = self.cash - float(trade_back['cummulativeQuoteQty'])
+        self.asset_count = self.asset_count + float(trade_back['executedQty'])
 
         policy = {
             'id': self.policy_id,

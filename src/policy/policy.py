@@ -84,26 +84,27 @@ class Policy:
         back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 120)
         if back is None:
             return 
-        back['timestamp'] = TimeFormat.get_current_timestamp_format()
-        policy_change = exe_policy.after_trade(back)
+        
+        trade_back = json.loads(back)
+        trade_back['timestamp'] = TimeFormat.get_current_timestamp_format()
+        policy_change = exe_policy.after_trade(trade_back)
         if policy_change is None:
             return
 
-        self.redis_client.LPush("policy#database", json.loads(policy_change))
+        self.redis_client.LPush("policy#database", json.dumps(policy_change))
     
     def monit_database(self):
         while True:
-            policy_change = self.redis_client.BRPop("policy#database", 60)
+            policy_change = self.redis_client.BRPop("policy#database", 0)
             if policy_change is None:
                 continue
 
-            policy = json.dumps(policy_change)
+            policy = json.loads(policy_change)
             self.policy_db.update_policy_status(
                 policy['id'], 
                 policy['cash_inuse'], 
                 policy['cash'], 
                 policy['asset_count'],
-                policy['timestamp'],
-                json.dumps(policy['condition'])
+                policy['timestamp']
             )
         

@@ -24,7 +24,7 @@ class BinanceOpt:
             if response.status_code == 200:
                 return response.json()
             else:
-                print(f"Request failed with status code {response.status_code}")
+                print(f"Request failed with status code {response.status_code} {response.text}")
                 return None
         except Exception as e:
             print("Error:", e)
@@ -156,3 +156,6 @@ class BinanceOpt:
             'timestamp': int(time.time() * 1000)
         }
         return self._make_signed_request("POST", self.gconf['url'] + self.gconf['order'], api_key, api_secret, data=order_payload)
+
+    def get_exchange_info(self):
+        return self._make_request("GET", self.gconf['url'] + self.gconf['exchange_info'])

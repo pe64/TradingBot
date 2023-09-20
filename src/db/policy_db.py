@@ -48,12 +48,12 @@ class PolicyDB:
         return res
     
 
-    def update_policy_status(self, policy_id, cash_inuse, cash, asset_count, today, condition):
+    def update_policy_status(self, policy_id, cash_inuse, cash, asset_count, today, condition = None):
         if condition is None:
-            cmd = "UPDATE policy SET cash_inuse = %s, cash = %s, asset_count = %s, date = %s WHERE id == %d" \
+            cmd = "UPDATE policy SET cash_inuse = %s, cash = %s, asset_count = %s, timestamp = %s WHERE id == %d" \
                 %(cash_inuse, cash, asset_count, today, policy_id)
         else:
-            cmd = "UPDATE policy SET cash_inuse = %s, cash = %s, asset_count = %s, date = %s, condition = %s WHERE id == %d" \
+            cmd = "UPDATE policy SET cash_inuse = %s, cash = %s, asset_count = %s, timestamp = %s, condition = %s WHERE id == %d" \
                 %(cash_inuse, cash, asset_count, today, condition, policy_id)
         
         self.cur.execute(cmd)
