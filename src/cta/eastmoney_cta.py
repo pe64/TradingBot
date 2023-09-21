@@ -2,9 +2,10 @@ import time
 import sys
 import datetime 
 from http_opt.eastmoney import HttpEM
-from db.em_sqlite import SqliteEM
+from db.account_db import AccountDB
 from http_opt.fund_http import fund_http_real_time_charge
 from policy.policy import Policy
+from utils.redis import Redis
 
 def time_last_nday(date, days):
     ret = (datetime.datetime.strptime(date, "%Y-%m-%d") + 
@@ -14,10 +15,11 @@ def time_last_nday(date, days):
 class EastMoneyCta:
     def __init__(self, cf) -> None:
         self.em = []
-        self.em_sq = SqliteEM(cf['sqlite_path']['em'])
-        accounts = self.em_sq.get_accounts()
-        for account in accounts:
-            self.em.append(HttpEM(cf, account['arg'], account['id']))
+        self.em_sq = AccountDB(cf['sqlite_path'])
+        self.accounts = self.em_sq.get_eastmoney_accounts()
+        #for account in self.accounts:
+        #    self.em.append(HttpEM(cf, account['arg'], account['id']))
+        self.redis_client = Redis(cf)
         self.gconf=cf
         self.policy = []
         self.today = time.strftime("%Y%m%d", time.localtime())
@@ -25,6 +27,17 @@ class EastMoneyCta:
         self.new_asset_flag = 0
         self.ttb_yield = 0
         pass
+    
+    def get_accounts(self):
+        return self.accounts
+
+    def run(self, account):
+        htp = HttpEM(self.gconf, account, account['id'])
+        while False == htp.get_validate_key():
+                htp.login_em_ver_code()
+                htp.login_em_platform()
+        pass
+        #self.login()
 
     def get_policy_obj_by_id(self, pid):
         for p in self.policy:

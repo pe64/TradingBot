@@ -1,4 +1,3 @@
-
 import sqlite3
 
 class AccountDB:
@@ -24,20 +23,19 @@ class AccountDB:
        rows = self.cur.fetchall()
        return rows[0][1]
 
-    def get_accounts(self):
+    def get_eastmoney_accounts(self):
         res = []
-        self.cur.execute('SELECT id, userid, duration, password FROM account')
+        self.cur.execute('SELECT id, userid, duration, password FROM account WHERE type = "eastmoney"')
         rows = self.cur.fetchall()
         for row in rows:
-            res.append({"id": row[0],
-                "arg":{
+            res.append({
+                    "id": row[0],
                     "userId": row[1],
                     "duration": row[2],
                     "authCode": "",
                     "type": "Z",
                     "password": row[3]
-                }
-            })
+                })
         return res
 
     def get_his_deals_contract_by_step(self, step, a_id):

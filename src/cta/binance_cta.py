@@ -28,11 +28,11 @@ class BinanceCta:
         pass
 
 
-    def get_binance_accounts_num(self):
-        return len(self.accounts)
+    def get_accounts(self):
+        return self.accounts_db
     
-    def binance_account_run(self, ids):
-        account_id = self.accounts_db[ids]['id']
+    def run(self, account):
+        account_id = account['id']
         while True:
             _, message = self.redis_client.Subscribe(
                 "left#trade#" + 
