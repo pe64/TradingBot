@@ -36,7 +36,7 @@ class AutoBuy:
             charge['timestamp'], 
             self.timestamp,
             self.period
-        ) is True:
+        ) is False:
             return None
         
         ret = {
