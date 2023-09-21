@@ -104,7 +104,8 @@ class TimeFormat:
 
                 if "week_day" in config["start_time"]:
                     week_day = config["start_time"]["week_day"].lower()
-                    if week_day != target_time.strftime("%A").lower():
+                    _ = target_time.strftime('%a').lower()
+                    if week_day != target_time.strftime("%a").lower():
                         return False
 
             if "end_time" in config:

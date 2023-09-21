@@ -22,12 +22,17 @@ class AutoBuy:
         return cur < close and cash > buy_count and timediff > timedelta and timerange 
 
     def execute(self, charge):
+        buy_count = 0
+        if self.condition['type'] == 'cash':
+            buy_count = self.condition['count']
+        else:
+            buy_count = self.condition['count'] * charge['cur']
 
         if self.check_buy_condition(
             charge['cur'], 
             charge['close'], 
             self.cash, 
-            self.condition['count'], 
+            buy_count, 
             charge['timestamp'], 
             self.timestamp,
             self.period
