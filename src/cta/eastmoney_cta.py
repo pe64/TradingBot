@@ -1,4 +1,5 @@
 import time
+import json
 import sys
 import datetime 
 from http_opt.eastmoney import HttpEM
@@ -32,12 +33,23 @@ class EastMoneyCta:
         return self.accounts
 
     def run(self, account):
-        htp = HttpEM(self.gconf, account, account['id'])
+        aid = account['id']
+        htp = HttpEM(self.gconf, account, aid)
         while False == htp.get_validate_key():
-                htp.login_em_ver_code()
-                htp.login_em_platform()
-        pass
-        #self.login()
+            htp.login_em_ver_code(aid)
+            htp.login_em_platform(aid)
+
+        while True:
+            _, message = self.redis_client.Subscribe(
+                "left#trade#" + str(aid)
+            )
+            order = json.loads(message)
+            if order['trade'] == 'SELL':
+                pass
+            elif order['trade'] == 'BUY':
+                pass
+            else:
+                self.update_account_status(htp)
 
     def get_policy_obj_by_id(self, pid):
         for p in self.policy:

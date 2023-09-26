@@ -284,7 +284,7 @@ eastmoney:
     'sec-gpc: 1'
   ]
   ver_code:
-    file: "cache/em.png"
+    file: "cache/vercode"
     url: "https://jywg.18.cn/Login/YZM"
     headers: [
       'Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',

@@ -4,6 +4,7 @@ import json
 import sys
 import datetime
 import time
+import hashlib
 from http import cookiejar
 from urllib import request,parse
 from http_opt.fund51_http import get_time_day, get_time_strl
@@ -75,8 +76,22 @@ class HttpEM:
             headers[sp[0]] = sp[1].strip()
         return headers
 
-    def login_em_ver_code(self):
-        code_path = self.ver_conf["file"]
+    def wget_em_ver_code(self):
+        code_path = self.ver_conf["file"] + str(time.time()) + ".png"
+        url = self.ver_conf['url'] + "?" + "randNum=" + self.random 
+        headers = self.build_headers(self.ver_conf["headers"])
+        req = request.Request(url, headers=headers)
+        resp = self.opener.open(req)
+        text = resp.read()
+        sha256_hash = hashlib.sha256()
+        sha256_hash.update(text)
+        hash_hex = sha256_hash.hexdigest()
+        final_path = f"cache/{hash_hex}.png"
+        with open(final_path, "wb") as f:
+            f.write(text)
+        
+    def login_em_ver_code(self, aid):
+        code_path = self.ver_conf["file"] + str(aid) + ".png"
 
         url = self.ver_conf['url'] + "?" + "randNum=" + self.random 
         headers = self.build_headers(self.ver_conf["headers"])
@@ -85,13 +100,13 @@ class HttpEM:
         text = resp.read()
         with open(code_path, "wb") as f:
             f.write(text)
+        os.system("catimg "+code_path)
         #self.ver_code = ocr_em(code_path)
         #if self.ver_code != None and len(self.ver_code) == 6:
         #    break
         #else:
         #    print("ver_code error.")
         #    time.sleep(120)
-
 
     def http_post(self, url, arg, headers, raw=False):
         if raw == False:
@@ -107,8 +122,9 @@ class HttpEM:
         except:
             return {"Status":0}
 
-    def login_em_platform(self):
+    def login_em_platform(self, aid):
         url = self.login_conf["url"]
+        path = self.ver_conf["file"] + str(aid) + ".png"
         headers = self.build_headers(self.login_conf["headers"])
         rsa = JSEncrypt(self.login_conf["private_key"])
         self.login_js["password"] = rsa.rsa_long_encrypt(self.password)
@@ -119,7 +135,7 @@ class HttpEM:
         if js["Status"] == 0:
             print("login success %s."%str(datetime.datetime.now()))
             self.cookie.save(filename=self.cookie_path,ignore_discard=True, ignore_expires=True)
-            os.rename(self.ver_conf["file"], str(self.ver_conf['file']).replace("em", self.login_js['identifyCode']))
+            os.rename(path, str(path).replace("vercode"+str(aid), self.login_js['identifyCode']))
         else:
             print("login error.")
         pass
