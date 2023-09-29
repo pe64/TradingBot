@@ -12,16 +12,12 @@ from http_opt.fund51_http import get_time_day, get_time_strl
 from crypto.rsa_crypto import JSEncrypt
 
 class HttpEM:
-    def __init__(self, cf, account, a_id) -> None:
-        self.cookie_path = cf["eastmoney"]["cookie"] + str(a_id)
-        self.account_id = a_id
-        if os.path.exists(self.cookie_path):
-            self.cookie = cookiejar.LWPCookieJar(self.cookie_path)
-            self.cookie.load(ignore_expires=True,ignore_discard=True)
-        else:
-            self.cookie = cookiejar.LWPCookieJar()
-        self.cookie_handler = request.HTTPCookieProcessor(self.cookie)
-        self.opener = request.build_opener(self.cookie_handler)
+    def __init__(self, cf, account) -> None:
+        self.account_id = account['id']
+        self.cookie_path = cf["eastmoney"]["cookie"] + str(self.account_id)
+
+        self.update_cookie()
+
         self.ver_conf = cf["eastmoney"]["ver_code"]
         self.login_conf = cf["eastmoney"]['login']
         self.validatekey_conf = cf["eastmoney"]["validatekey"]
@@ -59,6 +55,16 @@ class HttpEM:
         self.login_js = account
         self.password = self.login_js['password']
         pass
+    
+    def update_cookie(self):
+        if os.path.exists(self.cookie_path):
+            self.cookie = cookiejar.LWPCookieJar(self.cookie_path)
+            self.cookie.load(ignore_expires=True,ignore_discard=True)
+        else:
+            self.cookie = cookiejar.LWPCookieJar()
+        self.cookie_handler = request.HTTPCookieProcessor(self.cookie)
+        self.opener = request.build_opener(self.cookie_handler)
+        pass
 
     def get_user_id(self):
         return self.user_id[6:] + "******"
@@ -90,8 +96,8 @@ class HttpEM:
         with open(final_path, "wb") as f:
             f.write(text)
         
-    def login_em_ver_code(self, aid):
-        code_path = self.ver_conf["file"] + str(aid) + ".png"
+    def login_em_ver_code(self):
+        code_path = self.ver_conf["file"] + str(self.account_id) + ".png"
 
         url = self.ver_conf['url'] + "?" + "randNum=" + self.random 
         headers = self.build_headers(self.ver_conf["headers"])
@@ -122,9 +128,9 @@ class HttpEM:
         except:
             return {"Status":0}
 
-    def login_em_platform(self, aid):
+    def login_em_platform(self):
         url = self.login_conf["url"]
-        path = self.ver_conf["file"] + str(aid) + ".png"
+        path = self.ver_conf["file"] + str(self.account_id) + ".png"
         headers = self.build_headers(self.login_conf["headers"])
         rsa = JSEncrypt(self.login_conf["private_key"])
         self.login_js["password"] = rsa.rsa_long_encrypt(self.password)
@@ -135,7 +141,7 @@ class HttpEM:
         if js["Status"] == 0:
             print("login success %s."%str(datetime.datetime.now()))
             self.cookie.save(filename=self.cookie_path,ignore_discard=True, ignore_expires=True)
-            os.rename(path, str(path).replace("vercode"+str(aid), self.login_js['identifyCode']))
+            os.rename(path, str(path).replace("vercode"+str(self.account_id), self.login_js['identifyCode']))
         else:
             print("login error.")
         pass

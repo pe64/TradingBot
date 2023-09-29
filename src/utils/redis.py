@@ -45,3 +45,7 @@ class Redis:
     def GetAssetById(self, asset_id):
         asset_str = self.r.get("asset#" + str(asset_id))
         return asset_str
+    
+    def UpdateEastMoneyCookies(self, account_id):
+        msg ='{"trade":"UPDATE"}'
+        self.r.publish("left#trade#" + str(account_id),msg)

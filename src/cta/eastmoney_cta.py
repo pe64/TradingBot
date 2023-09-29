@@ -35,18 +35,24 @@ class EastMoneyCta:
     def run(self, account):
         ret = False
         aid = account['id']
-        htp = HttpEM(self.gconf, account, aid)
+        htp = HttpEM(self.gconf, account)
         while False == htp.get_validate_key():
-            htp.login_em_ver_code(aid)
-            htp.login_em_platform(aid)
+            htp.update_cookie()
+            time.sleep(10)
+            continue
 
         while True:
             _, message = self.redis_client.Subscribe(
                 "left#trade#" + str(aid)
             )
             order = json.loads(message)
+            if order['trade'] == 'UPDATE':
+                htp.update_cookie()
+                continue
+
             asset_str = self.redis_client.GetAssetById(order['asset_id'])
             asset = json.loads(asset_str)
+
             if order['trade'] == 'SELL':
                 if asset['type'] == 'fund':
                     if order['type'] == 'cash':
@@ -70,7 +76,8 @@ class EastMoneyCta:
                 pass
                 
             else:
-                self.update_account_status(htp)
+                htp.update_cookie()
+                #self.update_account_status(htp)
             
             if ret is True:
                 ret_msg = {

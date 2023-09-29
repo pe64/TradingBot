@@ -33,6 +33,16 @@
             "cwd":"${workspaceFolder}",
             "justMyCode": true,
             "args": ["redis"]
+        },
+        {
+            "name": "em_login.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/em_login.py",
+            "console": "integratedTerminal",
+            "cwd":"${workspaceFolder}",
+            "justMyCode": true,
+            "args": ["redis"]
         }
     ]
 }
