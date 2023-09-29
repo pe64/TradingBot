@@ -33,6 +33,7 @@ class EastMoneyCta:
         return self.accounts
 
     def run(self, account):
+        ret = False
         aid = account['id']
         htp = HttpEM(self.gconf, account, aid)
         while False == htp.get_validate_key():
@@ -44,13 +45,50 @@ class EastMoneyCta:
                 "left#trade#" + str(aid)
             )
             order = json.loads(message)
+            asset_str = self.redis_client.GetAssetById(order['asset_id'])
+            asset = json.loads(asset_str)
             if order['trade'] == 'SELL':
+                if asset['type'] == 'fund':
+                    if order['type'] == 'cash':
+                        cash = order['quantity']
+                        quantity = order['quantity'] / order['price']
+                    else:
+                        cash = order['quantity'] * order['price']
+                        quantity = order['quantity']
+
+                    ret, contract = self.sale_fund(htp, order['symbol'], quantity, asset['market'])
                 pass
             elif order['trade'] == 'BUY':
+                if asset['type'] == 'fund':
+                    if order['type'] == 'cash':
+                        cash = order['quantity'] 
+                        quantity = cash / order['price']
+                    else:
+                        cash = order['quantity'] * order['price']
+                        quantity = order['quantity']
+                    ret, contract = self.buy_fund(htp, order['symbol'], cash)
                 pass
+                
             else:
                 self.update_account_status(htp)
-
+            
+            if ret is True:
+                ret_msg = {
+                    'status': "FILLED",
+                    'orderId': contract,
+                    'origQty': quantity,
+                    'executedQty': quantity,
+                    'cummulativeQuoteQty': cash
+                }
+            else:
+                ret_msg = {
+                    "status": "EXPIRED"
+                }
+            self.redis_client.LPush(
+                "right#trade#" + str(aid),
+                json.dumps(ret_msg)
+            )
+            
     def get_policy_obj_by_id(self, pid):
         for p in self.policy:
             if pid == p.get_policy_id():
@@ -285,14 +323,23 @@ class EastMoneyCta:
         sys.stdout.flush()
 
     def buy_fund(self, em, code, vol):
-        em.check_sdx(code)
-        em.check_status(code, None)
-        em.sign_contract(code)
-        return True, em.fund_submit_trade(code, vol, "buy")
+        try:
+            em.check_sdx(code)
+            em.check_status(code, None)
+            em.sign_contract(code)
+            contract = em.fund_submit_trade(code, vol, "buy")
+            if contract is None:
+                return False, ""
+            return True, contract
+        except:
+            return False, ""
     
     def sale_fund(self, em, code, vol, company):
-        em.check_status(code, company)
-        return em.fund_submit_trade(code, vol, "sale")
+        try:
+            em.check_status(code, company)
+            return True, em.fund_submit_trade(code, vol, "sale")
+        except:
+            return False, ""
 
     def check_stock_time(self, now=None):
         if now is None:

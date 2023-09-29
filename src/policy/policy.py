@@ -50,14 +50,11 @@ class Policy:
             self.threads.append(policy_thread)
             policy_thread.start()
 
-    def get_asset_by_id(self, asset_id):
-        asset_str = self.redis_client.Get("asset#" + str(asset_id))
-        return json.loads(asset_str)
-
     def run_policy(self, policy):
         subscribe_key = ""
-        asset = self.get_asset_by_id(policy.asset_id)
-        
+        asset_str = self.redis_client.GetAssetById(policy.asset_id)
+
+        asset = json.loads(asset_str)
         if asset['type'] == "coin":
             subscribe_key = asset['type'] + "#" + \
                             asset['market'] + "#" + \
@@ -80,6 +77,7 @@ class Policy:
         if trade_message is None:
             return
         trade_message['policy_id'] = exe_policy.policy_id
+        trade_message['asset_id'] = exe_policy.asset_id
         self.redis_client.Publish("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
         back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 120)
         if back is None:

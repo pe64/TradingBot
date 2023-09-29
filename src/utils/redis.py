@@ -41,3 +41,7 @@ class Redis:
 
     def Get(self, key):
         return self.r.get(key)
+
+    def GetAssetById(self, asset_id):
+        asset_str = self.r.get("asset#" + str(asset_id))
+        return asset_str

@@ -169,8 +169,10 @@ class HttpEM:
         js = self.http_post(url, arg=data, headers=headers)
         if js["Status"] == 0:
             self.cookie.save(filename=self.cookie_path, ignore_discard=True, ignore_expires=True)
+            return True
         else:
             print("sign contract error [%s]"%js['Message'])
+            return False
         pass
 
     def check_sdx(self, fcode):
@@ -182,8 +184,10 @@ class HttpEM:
         js = self.http_post(url, arg=data, headers=headers)
         if js['Status'] == 0:
             self.cookie.save(filename=self.cookie_path,ignore_discard=True, ignore_expires=True)
+            return True
         else:
             print("check sdx error [%s]"%js["Message"])
+            return False
         pass
 
     def check_status(self, fcode, company):
@@ -202,8 +206,10 @@ class HttpEM:
         js = self.http_post(url, arg=data, headers=headers)
         if js['Status'] == 0:
             self.cookie.save(filename=self.cookie_path,ignore_discard=True, ignore_expires=True)
+            return True
         else:
             print("check status error [%s]"%js["Message"])
+            return False
         pass
     
     def fund_submit_trade(self, fcode, vol, func):
@@ -236,6 +242,7 @@ class HttpEM:
             return js['Data'][0]["Wtbh"]
         else:
             print("submit trade error [%s]"%js["Message"])
+            return None
         pass
 
     def get_revoke_list(self):
