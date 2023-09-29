@@ -15,8 +15,12 @@ if __name__ == "__main__":
     
     while True:
         for htp in htps:
-            if False == htp.get_validate_key():
-                htp.login_em_ver_code()
-                htp.login_em_platform()
-                rds.UpdateEastMoneyCookies(htp.account_id)
+            try:
+                if False == htp.get_validate_key():
+                    htp.login_em_ver_code()
+                    htp.login_em_platform()
+                    rds.UpdateEastMoneyCookies(htp.account_id)
+            except Exception as e:
+                print("error:", e)
+                continue
         time.sleep(60)     
