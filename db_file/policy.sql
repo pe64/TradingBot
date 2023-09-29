@@ -1,24 +1,5 @@
-/*
- Navicat Premium Data Transfer
+BEGIN;
 
- Source Server         : em
- Source Server Type    : SQLite
- Source Server Version : 3035005
- Source Schema         : main
-
- Target Server Type    : SQLite
- Target Server Version : 3035005
- File Encoding         : 65001
-
- Date: 09/10/2022 11:18:17
-*/
-
-PRAGMA foreign_keys = false;
-
--- ----------------------------
--- Table structure for policy
--- ----------------------------
-DROP TABLE IF EXISTS "policy";
 CREATE TABLE "policy" (
     id INTEGER PRIMARY KEY
   , account_id INTEGER
@@ -34,6 +15,27 @@ CREATE TABLE "policy" (
   , execution_time TEXT
 );
 
-INSERT INTO "table" VALUES(1,1,1,15,'autobuy','10.045','0','-0.0481999999999996','{"period":"1w","type":"asset","count":5.0}','21.0','20230921144235','{"start_time": {"week_day": "Thu","time": "14:30"},"end_time": {"week_day": "Thu","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 15, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 16, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 17, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 18, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 19, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 20, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 21, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 22, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 23, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 24, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 25, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 26, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 27, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 28, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 29, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 30, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 31, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 32, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 33, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 34, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(1, 1, 35, 'autobuy', '100', '0.0', '0.0', '{"period":"1w","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"week_day": "Sun","time": "14:30"},"end_time": {"week_day": "Sun","time": "15:59"}}');
+INSERT INTO policy(account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES(2, 1, 9, 'autobuy', '300', '0.0', '0.0', '{"period":"1d","type":"cash","count":10.0}', '0', '20230921144235', '{"start_time": {"time": "00:30"},"end_time": {"time": "15:59"}}');
 
-PRAGMA foreign_keys = true;
+COMMIT;
