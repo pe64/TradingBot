@@ -83,7 +83,7 @@ class HttpEM:
         return headers
 
     def wget_em_ver_code(self):
-        code_path = self.ver_conf["file"] + str(time.time()) + ".png"
+        code_path = self.ver_conf["file"] + str(time.time()) + ".jpg"
         url = self.ver_conf['url'] + "?" + "randNum=" + self.random 
         headers = self.build_headers(self.ver_conf["headers"])
         req = request.Request(url, headers=headers)
@@ -92,12 +92,12 @@ class HttpEM:
         sha256_hash = hashlib.sha256()
         sha256_hash.update(text)
         hash_hex = sha256_hash.hexdigest()
-        final_path = f"cache/{hash_hex}.png"
+        final_path = f"cache/{hash_hex}.jpg"
         with open(final_path, "wb") as f:
             f.write(text)
         
     def login_em_ver_code(self):
-        code_path = self.ver_conf["file"] + str(self.account_id) + ".png"
+        code_path = self.ver_conf["file"] + str(self.account_id) + ".jpg"
 
         url = self.ver_conf['url'] + "?" + "randNum=" + self.random 
         headers = self.build_headers(self.ver_conf["headers"])
@@ -130,7 +130,7 @@ class HttpEM:
 
     def login_em_platform(self):
         url = self.login_conf["url"]
-        path = self.ver_conf["file"] + str(self.account_id) + ".png"
+        path = self.ver_conf["file"] + str(self.account_id) + ".jpg"
         headers = self.build_headers(self.login_conf["headers"])
         rsa = JSEncrypt(self.login_conf["private_key"])
         self.login_js["password"] = rsa.rsa_long_encrypt(self.password)
