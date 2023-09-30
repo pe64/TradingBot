@@ -11,6 +11,12 @@ redis:
 
 sqlite_path: "db_file/common.db"
 
+virtual:
+  enabled: true
+  start_time: "20200101000000"
+  end_time: "20230930120600"
+  sqlite_path: "db_file/virtual.db"
+
 logging:
   format: "%(asctime)s - %(levelname)s - %(message)s"
   file: log/trading.log

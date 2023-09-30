@@ -17,11 +17,11 @@ from policy.bond import Bond
 from policy.auto_sale import AutoSale
 
 class Policy:
-    def __init__(self, config) -> None:
-        self.policy_db = PolicyDB(config["sqlite_path"])
-        self.asset_db = AssetDB(config['sqlite_path'])
+    def __init__(self, db_path, redis_conf) -> None:
+        self.policy_db = PolicyDB(db_path)
+        self.asset_db = AssetDB(db_path)
         self.policies = self.policy_db.get_policys()
-        self.redis_client = Redis(config)
+        self.redis_client = Redis(redis_conf)
         self.threads = []
     
     def create_policy_instance(self, policy_config):

@@ -2,7 +2,7 @@ import redis
 
 class Redis:
     def __init__(self, cf):
-        self.r = redis.StrictRedis(host=cf["redis"]["url"], port=cf['redis']['port'], db=0)
+        self.r = redis.StrictRedis(host=cf["url"], port=cf['port'], db=0)
         self.pubsub = self.r.pubsub()
 
     def Subscribe(self, key, policy, callback=None):
