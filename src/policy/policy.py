@@ -79,7 +79,6 @@ class Policy:
 
         for trade_message in actions:
             trade_message['policy_id'] = exe_policy.policy_id
-            trade_message['asset_id'] = exe_policy.asset_id
             self.redis_client.LPush("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
             back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 120)
             if back is None:

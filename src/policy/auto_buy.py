@@ -42,6 +42,7 @@ class AutoBuy:
         
         ret.append({
             'symbol': charge['symbol'],
+            'asset_id' : self.asset_id,
             'type': self.condition['type'],
             'trade': "BUY",
             'price': charge['cur'],
