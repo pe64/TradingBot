@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import time
+import pytz
 
 class TimeFormat:
     def __init__(self) -> None:
@@ -14,6 +15,15 @@ class TimeFormat:
         dt = datetime.strptime(input_str, dt_format)
         return dt.strftime("%Y%m%d%H%M%S")
     
+    @staticmethod
+    def get_utc_time(time_str = None):
+        if time_str is None:
+            return datetime.utcnow()
+        else:
+            dt = datetime.strptime(time_str, "%Y%m%d%H%M%S")
+            return pytz.utc.localize(dt)
+
+
     @staticmethod
     def calculate_time_range(current_utc_time, interval):
         if interval == "8h":
@@ -63,12 +73,11 @@ class TimeFormat:
             return timedelta(minutes=1)
     
     @staticmethod
-    def get_current_timestamp_format():
-        timestamp = time.time()
-        formatted_time = datetime.fromtimestamp(timestamp)
-        formatted_str = formatted_time.strftime("%Y%m%d%H%M%S")
-        return formatted_str
-    
+    def get_current_timestamp_format(current_utc_time):
+        # 将UTC时间转换为中国的当地时间
+        local_time = current_utc_time.astimezone(pytz.timezone('Asia/Shanghai'))
+        return local_time.strftime("%Y%m%d%H%M%S")
+
     @staticmethod
     def parse_time(time_info, target_time_str):
         try:

@@ -85,7 +85,7 @@ class Policy:
                 continue 
         
             trade_back = json.loads(back)
-            trade_back['timestamp'] = TimeFormat.get_current_timestamp_format()
+            trade_back['timestamp'] = charge['timestamp']
             policy_change = exe_policy.after_trade(trade_back)
             if policy_change is None:
                 continue

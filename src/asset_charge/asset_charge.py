@@ -13,10 +13,17 @@ from utils.time_format import TimeFormat
 class AssetCharge:
     def __init__(self, cf):
         self.gconf = cf
-        self.asset_db = AssetDB(cf['sqlite_path'])
+        self.virtual_flag = cf['virtual']['enabled']
+        if self.virtual_flag:
+            self.asset_db = AssetDB(cf['virtual']['sqlite_path'])
+        else:
+            self.asset_db = AssetDB(cf['sqlite_path'])
+        self.virtual_start = cf['virtual']['start_time']
+        self.virtual_end = cf['virtual']['end_time']
+        self.virtual_days = 0
         self.bn = BinanceOpt(cf)
         self.stock = StockCharge(cf)
-        self.rd = Redis(cf)
+        self.rd = Redis(cf['redis'])
     
     def fetch_fund_data(self, fund):
         ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['symbol'])
@@ -55,7 +62,7 @@ class AssetCharge:
         return
 
     def fetch_coin_data(self, coin):
-        current_utc_time = datetime.utcnow()
+        current_utc_time = TimeFormat.get_utc_time()
         intervals = [
             "8h", 
             "1d", 
@@ -65,16 +72,13 @@ class AssetCharge:
         for interval in intervals:
             start_time_stamp = TimeFormat.calculate_time_range(current_utc_time, interval)
             ret = self.bn.get_kline_data(coin['symbol'], interval, start_time_stamp)
-            if ret is None:
-                continue
-            else:
-                ret['timestamp'] = time.strftime("%Y%m%d%H%M%S", time.localtime())
+            if ret is not None:
+                ret['timestamp'] = TimeFormat.get_current_timestamp_format(current_utc_time)
                 self.rd.Publish(f"coin#binance#{interval}#{coin['symbol']}", json.dumps(ret))
 
 
     def fetch_assets(self, asset_list, fetch_func):
         while True:
-            self.today = time.strftime("%Y%m%d", time.localtime())
             for asset in asset_list:
                 fetch_func(asset)
             time.sleep(10)
@@ -90,15 +94,20 @@ class AssetCharge:
         self.upload_asset(funds)
         self.upload_asset(stocks)
         self.upload_asset(coins)
-        fund_thread = threading.Thread(target=self.fetch_assets, args=(funds, self.fetch_fund_data))
-        stock_thread = threading.Thread(target=self.fetch_assets, args=(stocks, self.fetch_stock_data))
-        coin_thread = threading.Thread(target=self.fetch_assets, args=(coins, self.fetch_coin_data))
+        if self.virtual_flag:
+            coin_thread = threading.Thread(target=self.fetch_assets, args=(coins, self.fetch_coin_data))
+            coin_thread.start()
+            coin_thread.join()
+        else:
+            fund_thread = threading.Thread(target=self.fetch_assets, args=(funds, self.fetch_fund_data))
+            stock_thread = threading.Thread(target=self.fetch_assets, args=(stocks, self.fetch_stock_data))
+            coin_thread = threading.Thread(target=self.fetch_assets, args=(coins, self.fetch_coin_data))
 
-        fund_thread.start()
-        stock_thread.start()
-        coin_thread.start()
+            fund_thread.start()
+            stock_thread.start()
+            coin_thread.start()
 
-        fund_thread.join()
-        stock_thread.join()
-        coin_thread.join()
+            fund_thread.join()
+            stock_thread.join()
+            coin_thread.join()
 
