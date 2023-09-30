@@ -34,9 +34,10 @@ class BinanceCta:
     def run(self, account):
         account_id = account['id']
         while True:
-            _, message = self.redis_client.Subscribe(
+            message = self.redis_client.BRPop(
                 "left#trade#" + 
-                str(account_id)
+                str(account_id),
+                0
             )
             order = json.loads(message)
             if order['trade'] == "SELL":

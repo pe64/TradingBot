@@ -5,14 +5,14 @@ class Redis:
         self.r = redis.StrictRedis(host=cf["redis"]["url"], port=cf['redis']['port'], db=0)
         self.pubsub = self.r.pubsub()
 
-    def Subscribe(self, key, callback=None):
+    def Subscribe(self, key, policy, callback=None):
         self.pubsub.subscribe(key)
         for message in self.pubsub.listen():
             if message['type'] == 'message':
                 if callback:
-                    callback(message['channel'], message['data'])
+                    callback(message['channel'], message['data'], policy)
                 else:
-                    return message['channel'], message['data']
+                    return message['data']
 
     def PSubscribe(self, pattern, policy, callback=None):
         self.pubsub.psubscribe(pattern)
@@ -21,7 +21,7 @@ class Redis:
                 if callback:
                     callback(message['channel'], message['data'], policy)
                 else:
-                    return message['channel'], message['data']
+                    return message['data']
     
     def Publish(self, key, content):
         self.r.publish(key, content) 

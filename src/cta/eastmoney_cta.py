@@ -42,8 +42,8 @@ class EastMoneyCta:
             continue
 
         while True:
-            _, message = self.redis_client.Subscribe(
-                "left#trade#" + str(aid)
+            message = self.redis_client.BRPop(
+                "left#trade#" + str(aid),0
             )
             order = json.loads(message)
             if order['trade'] == 'UPDATE':

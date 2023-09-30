@@ -65,7 +65,7 @@ class Policy:
                             policy.period + '#' + \
                             asset['symbol']
         while True:
-            self.redis_client.PSubscribe(
+            self.redis_client.Subscribe(
                 subscribe_key, 
                 policy, 
                 callback=self.charge_callback
@@ -78,7 +78,7 @@ class Policy:
             return
         trade_message['policy_id'] = exe_policy.policy_id
         trade_message['asset_id'] = exe_policy.asset_id
-        self.redis_client.Publish("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
+        self.redis_client.LPush("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
         back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 120)
         if back is None:
             return 
