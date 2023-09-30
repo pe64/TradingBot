@@ -13,7 +13,7 @@ sqlite_path: "db_file/common.db"
 
 virtual:
   enabled: true
-  start_time: "20200101000000"
+  start_time: "20220101111111"
   end_time: "20230930120600"
   sqlite_path: "db_file/virtual.db"
 

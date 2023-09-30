@@ -20,12 +20,11 @@ class AssetCharge:
             self.asset_db = AssetDB(cf['sqlite_path'])
         self.virtual_start = cf['virtual']['start_time']
         self.virtual_end = cf['virtual']['end_time']
-        self.virtual_days = 0
         self.bn = BinanceOpt(cf)
         self.stock = StockCharge(cf)
         self.rd = Redis(cf['redis'])
     
-    def fetch_fund_data(self, fund):
+    def fetch_fund_data(self, fund, days =0):
         ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['symbol'])
         if ret is not None:
             charge = {
@@ -40,7 +39,7 @@ class AssetCharge:
             self.rd.Publish("fund#1d#" + fund['symbol'], json.dumps(charge))
 
 
-    def fetch_stock_data(self, stock):
+    def fetch_stock_data(self, stock, days=0):
         stock_info = self.stock.get_stock_charge(stock['symbol'], stock['market'])
         if stock_info is None:
             return
@@ -61,8 +60,11 @@ class AssetCharge:
         self.rd.Publish("stock#1d#" + stock['symbol'], json.dumps(data))
         return
 
-    def fetch_coin_data(self, coin):
-        utc, zone = TimeFormat.get_utc_time()
+    def fetch_coin_data(self, coin, days=0):
+        if self.virtual_flag:
+            utc, zone = TimeFormat.get_utc_time(self.virtual_start, days)
+        else:
+            utc, zone = TimeFormat.get_utc_time()
         intervals = [
             "8h", 
             "1d", 
@@ -71,16 +73,20 @@ class AssetCharge:
 
         for interval in intervals:
             start_time_stamp = TimeFormat.calculate_time_range(utc, interval)
-            ret = self.bn.get_kline_data(coin['symbol'], interval, start_time_stamp)
+            ret = self.bn.get_kline_data(coin['symbol'], interval, start_time_stamp, cur=(self.virtual_flag is False))
             if ret is not None:
                 ret['timestamp'] = TimeFormat.get_current_timestamp_format(zone)
                 self.rd.Publish(f"coin#binance#{interval}#{coin['symbol']}", json.dumps(ret))
 
 
     def fetch_assets(self, asset_list, fetch_func):
+        days = 0
         while True:
             for asset in asset_list:
-                fetch_func(asset)
+                fetch_func(asset, days)
+
+            if self.virtual_flag:
+                days = days + 1
             time.sleep(10)
 
     def upload_asset(self, assets):

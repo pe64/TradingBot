@@ -36,7 +36,7 @@ class BinanceOpt:
     def post_request(self, url, headers, data=None):
         return self._make_request("POST", url, headers=headers, data=data)
 
-    def get_kline_data(self, symbol, interval, start_time=None, limit=1):
+    def get_kline_data(self, symbol, interval, start_time=None, limit=1, cur=True):
         ret = {}
         params_kline = {
             "symbol": symbol,
@@ -61,6 +61,9 @@ class BinanceOpt:
         else:
             return None
                 
+        if cur is False:
+            return ret
+
         params_price = {
             "symbol": symbol
         }

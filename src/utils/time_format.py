@@ -16,11 +16,11 @@ class TimeFormat:
         return dt.strftime("%Y%m%d%H%M%S")
     
     @staticmethod
-    def get_utc_time(time_str = None):
+    def get_utc_time(time_str = None, days=0):
         if time_str is None:
             return datetime.utcnow(), datetime.now()
         else:
-            dt = datetime.strptime(time_str, "%Y%m%d%H%M%S")
+            dt = datetime.strptime(time_str, "%Y%m%d%H%M%S") + timedelta(days=days)
             return pytz.utc.localize(dt), dt
 
 
