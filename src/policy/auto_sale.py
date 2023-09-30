@@ -22,6 +22,7 @@ class AutoSale:
         return cur > close and asset_count > sell_count and timerange and timediff > timedelta 
     
     def execute(self, charge):
+        ret = []
         sell_count = 0
         if self.condition['type'] == 'asset':
             sell_count = self.condition['count']
@@ -39,13 +40,13 @@ class AutoSale:
             ) is False:
             return None
 
-        ret = {
+        ret.append({
             'symbol': charge['symbol'],
             'type': self.condition['type'],
             "trade": "SELL",
             "price": charge['cur'],
             'quantity': self.condition['count']
-        }
+        })
         return ret
     
     def after_trade(self, trade_back):

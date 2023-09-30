@@ -22,6 +22,7 @@ class AutoBuy:
         return cur < close and cash > buy_count  and timerange and timediff > timedelta
 
     def execute(self, charge):
+        ret = []
         buy_count = 0
         if self.condition['type'] == 'cash':
             buy_count = self.condition['count']
@@ -39,13 +40,13 @@ class AutoBuy:
         ) is False:
             return None
         
-        ret = {
+        ret.append({
             'symbol': charge['symbol'],
             'type': self.condition['type'],
             'trade': "BUY",
             'price': charge['cur'],
             'quantity': self.condition['count']
-        }
+        })
 
         return ret
 

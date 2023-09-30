@@ -73,23 +73,25 @@ class Policy:
 
     def charge_callback(self, channel, charge, exe_policy):
 
-        trade_message = exe_policy.execute(json.loads(charge))
-        if trade_message is None:
-            return
-        trade_message['policy_id'] = exe_policy.policy_id
-        trade_message['asset_id'] = exe_policy.asset_id
-        self.redis_client.LPush("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
-        back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 120)
-        if back is None:
-            return 
-        
-        trade_back = json.loads(back)
-        trade_back['timestamp'] = TimeFormat.get_current_timestamp_format()
-        policy_change = exe_policy.after_trade(trade_back)
-        if policy_change is None:
+        actions = exe_policy.execute(json.loads(charge))
+        if actions is None:
             return
 
-        self.redis_client.LPush("policy#database", json.dumps(policy_change))
+        for trade_message in actions:
+            trade_message['policy_id'] = exe_policy.policy_id
+            trade_message['asset_id'] = exe_policy.asset_id
+            self.redis_client.LPush("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
+            back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 120)
+            if back is None:
+                continue 
+        
+            trade_back = json.loads(back)
+            trade_back['timestamp'] = TimeFormat.get_current_timestamp_format()
+            policy_change = exe_policy.after_trade(trade_back)
+            if policy_change is None:
+                continue
+
+            self.redis_client.LPush("policy#database", json.dumps(policy_change))
     
     def monit_database(self):
         while True:
