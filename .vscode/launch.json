@@ -15,20 +15,20 @@
             "args": ["redis"]
         },
         {
-            "name": "policy.py",
+            "name": "account.py",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/src/policy.py",
+            "program": "${workspaceFolder}/src/account.py",
             "console": "integratedTerminal",
             "cwd":"${workspaceFolder}",
             "justMyCode": true,
             "args": ["redis"]
         },
         {
-            "name": "account.py",
+            "name": "policy.py",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/src/account.py",
+            "program": "${workspaceFolder}/src/policy.py",
             "console": "integratedTerminal",
             "cwd":"${workspaceFolder}",
             "justMyCode": true,
