@@ -18,10 +18,10 @@ class TimeFormat:
     @staticmethod
     def get_utc_time(time_str = None):
         if time_str is None:
-            return datetime.utcnow()
+            return datetime.utcnow(), datetime.now()
         else:
             dt = datetime.strptime(time_str, "%Y%m%d%H%M%S")
-            return pytz.utc.localize(dt)
+            return pytz.utc.localize(dt), dt
 
 
     @staticmethod

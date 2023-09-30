@@ -62,7 +62,7 @@ class AssetCharge:
         return
 
     def fetch_coin_data(self, coin):
-        current_utc_time = TimeFormat.get_utc_time()
+        utc, zone = TimeFormat.get_utc_time()
         intervals = [
             "8h", 
             "1d", 
@@ -70,10 +70,10 @@ class AssetCharge:
         ]
 
         for interval in intervals:
-            start_time_stamp = TimeFormat.calculate_time_range(current_utc_time, interval)
+            start_time_stamp = TimeFormat.calculate_time_range(utc, interval)
             ret = self.bn.get_kline_data(coin['symbol'], interval, start_time_stamp)
             if ret is not None:
-                ret['timestamp'] = TimeFormat.get_current_timestamp_format(current_utc_time)
+                ret['timestamp'] = TimeFormat.get_current_timestamp_format(zone)
                 self.rd.Publish(f"coin#binance#{interval}#{coin['symbol']}", json.dumps(ret))
 
 
