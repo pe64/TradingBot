@@ -7,7 +7,7 @@ from utils.redis import Redis
 if __name__ == "__main__":
     cf = yaml_load()
     em = EastMoneyCta(cf)
-    rds = Redis(cf)
+    rds = Redis(cf['redis']['url'], cf['redis']['port'])
     htps = []
     accounts = em.get_accounts()
     for account in accounts:

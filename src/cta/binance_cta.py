@@ -1,4 +1,6 @@
 import json
+import random
+import time
 
 from utils.redis import Redis
 from db.account_db import AccountDB
@@ -11,8 +13,9 @@ class BinanceCta:
         self.bn = BinanceOpt(config)
         self.accounts = {}
         self.accounts_db = self.db.get_binance_accounts()
-        self.redis_client = Redis(config)
+        self.redis_client = Redis(config['redis']['url'],config['redis']['port'])
         self.exchange_info = {}
+        self.virtual_flag = config['virtual']['enabled']
 
         for account in self.accounts_db:
             self.accounts["account_" + str(account['id'])] = account
@@ -31,7 +34,21 @@ class BinanceCta:
     def get_accounts(self):
         return self.accounts_db
     
+    def virtual_trade(self, order, account_id):
+        sleep_time = random.randint(0, 30)
+        print(order['trade'], order['symbol'], sleep_time)
+        ret_msg = {
+                "status": "FILLED",
+                "orderId": "VIRTUAL",
+                "origQty": order['quantity'],
+                "executedQty": order['quantity'],
+                "cummulativeQuoteQty": order['quantity']
+        }
+        time.sleep(sleep_time)
+        return ret_msg
+    
     def run(self, account):
+        ret_msg = {"status":"EXPIRED"}
         account_id = account['id']
         while True:
             message = self.redis_client.BRPop(
@@ -40,12 +57,18 @@ class BinanceCta:
                 0
             )
             order = json.loads(message)
-            if order['trade'] == "SELL":
-                self.sell_sopt_asset(order, account_id)
+
+            if self.virtual_flag:
+                ret_msg = self.virtual_trade(order, account_id)
+            elif order['trade'] == "SELL":
+                ret_msg = self.sell_sopt_asset(order, account_id)
             elif order['trade'] == "BUY":
-                self.buy_sopt_asset(order, account_id) 
+                ret_msg = self.buy_sopt_asset(order, account_id) 
             else:
                 self.update_account(str(account_id))
+
+            self.redis_client.LPush("right#trade#" + str(account_id) + "#" + str(order['policy_id']), json.dumps(ret_msg))
+        
 
     def round_quantity(self, symbol, quantity, price):
         if symbol in self.exchange_info and 'quoteAssetPrecision' in self.exchange_info[symbol]:
@@ -62,7 +85,7 @@ class BinanceCta:
         return None   
 
     def sell_sopt_asset(self, order, account_id):
-        order_msg = {}
+        ret_msg = {"status":"EXPIRED"}
         api_key = self.accounts["account_" + str(account_id)]['API_KEY']
         api_secret = self.accounts["account_" + str(account_id)]['API_SECRET']
         if order['type'] == "asset":
@@ -90,10 +113,11 @@ class BinanceCta:
                 "executedQty": order_msg['executedQty'],
                 "cummulativeQuoteQty": order_msg['cummulativeQuoteQty']
             }
-            self.redis_client.LPush("right#trade#" + str(account_id) + "#" + str(order['policy_id']), json.dumps(ret_msg))
+
+        return ret_msg
 
     def buy_sopt_asset(self, order, account_id):
-        order_msg = {}
+        ret_msg = {"status":"EXPIRED"}
         api_key = self.accounts['account_' + str(account_id)]['API_KEY']
         api_secret = self.accounts['account_' + str(account_id)]['API_SECRET']
         if order['type'] == "asset":
@@ -112,23 +136,16 @@ class BinanceCta:
                 api_key,
                 api_secret
             )
+        if order_msg is not None:
+            ret_msg = {
+                "status": order_msg['status'],
+                "orderId": order_msg['orderId'],
+                "origQty": order_msg['origQty'],
+                "executedQty": order_msg['executedQty'],
+                "cummulativeQuoteQty": order_msg['cummulativeQuoteQty']
+            }
 
-        ret_msg = {"status":"EXPIRED"}
-        push_key = "right#trade#" + str(account_id) + "#" + str(order['policy_id'])
-
-        if order_msg is None:
-            self.redis_client.LPush(push_key, json.dumps(ret_msg))
-            return
-
-        ret_msg = {
-            "status": order_msg['status'],
-            "orderId": order_msg['orderId'],
-            "origQty": order_msg['origQty'],
-            "executedQty": order_msg['executedQty'],
-            "cummulativeQuoteQty": order_msg['cummulativeQuoteQty']
-        }
-        self.redis_client.LPush(push_key, json.dumps(ret_msg))
-
+        return ret_msg
     def buy_feature_asset(self, order):
         pass
     

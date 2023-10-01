@@ -20,7 +20,7 @@ class EastMoneyCta:
         self.accounts = self.em_sq.get_eastmoney_accounts()
         #for account in self.accounts:
         #    self.em.append(HttpEM(cf, account['arg'], account['id']))
-        self.redis_client = Redis(cf)
+        self.redis_client = Redis(cf['redis']['url'], cf['redis']['port'])
         self.gconf=cf
         self.policy = []
         self.today = time.strftime("%Y%m%d", time.localtime())

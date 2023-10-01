@@ -22,7 +22,7 @@ class AssetCharge:
         self.virtual_end = cf['virtual']['end_time']
         self.bn = BinanceOpt(cf)
         self.stock = StockCharge(cf)
-        self.rd = Redis(cf['redis'])
+        self.rd = Redis(cf['redis']['url'], cf['redis']['port'])
     
     def fetch_fund_data(self, fund, days =0):
         ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['symbol'])

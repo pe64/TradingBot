@@ -21,7 +21,7 @@ class Policy:
         self.policy_db = PolicyDB(db_path)
         self.asset_db = AssetDB(db_path)
         self.policies = self.policy_db.get_policys()
-        self.redis_client = Redis(redis_conf)
+        self.redis_client = Redis(redis_conf['url'], redis_conf['port'])
         self.threads = []
     
     def create_policy_instance(self, policy_config):
@@ -72,8 +72,8 @@ class Policy:
             )
 
     def charge_callback(self, channel, charge, exe_policy):
-
-        actions = exe_policy.execute(json.loads(charge))
+        charge_msg = json.loads(charge)
+        actions = exe_policy.execute(charge_msg)
         if actions is None:
             return
 
@@ -85,7 +85,7 @@ class Policy:
                 continue 
         
             trade_back = json.loads(back)
-            trade_back['timestamp'] = charge['timestamp']
+            trade_back['timestamp'] = charge_msg['timestamp']
             policy_change = exe_policy.after_trade(trade_back)
             if policy_change is None:
                 continue
