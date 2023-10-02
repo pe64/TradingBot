@@ -16,6 +16,7 @@ class BinanceCta:
         self.redis_client = Redis(config['redis']['url'],config['redis']['port'])
         self.exchange_info = {}
         self.virtual_flag = config['virtual']['enabled']
+        self.virtual_cash = config['virtual']['cash']
 
         for account in self.accounts_db:
             self.accounts["account_" + str(account['id'])] = account
@@ -34,16 +35,47 @@ class BinanceCta:
     def get_accounts(self):
         return self.accounts_db
     
+    def virtual_buy_asset(self, price, cash):
+        if self.virtual_cash > cash:
+            self.virtual_cash = self.virtual_cash - cash
+            ret_msg = {
+                    "status": "FILLED",
+                    "orderId": "VIRTUAL",
+                    "origQty": cash / price,
+                    "executedQty": cash / price,
+                    "cummulativeQuoteQty": cash
+            }
+        else:
+            ret_msg = {
+                "status": "EXPIRED"
+            }
+        return ret_msg
+    
+    def virtual_sell_asset(self, price, quantity):
+        self.virtual_cash = self.virtual_cash + price * quantity
+        return {
+                    "status": "FILLED",
+                    "orderId": "VIRTUAL",
+                    "origQty": quantity, 
+                    "executedQty": quantity,
+                    "cummulativeQuoteQty": quantity * price
+            }
+
     def virtual_trade(self, order, account_id):
+        if order['trade'] == "BUY":
+            if order['type'] == "cash":
+                ret_msg = self.virtual_buy_asset(order['price'], order['quantity'])
+            else:
+                ret_msg = self.virtual_buy_asset(order['price'], order['quantity'] * order['price'])
+        else:
+            if order['type'] == "asset":
+                ret_msg = self.virtual_sell_asset(order['price'], order['quantity'])
+            else:
+                ret_msg = self.virtual_sell_asset(order['price'], order['quantity'] / order['price'])
+        
         sleep_time = random.randint(0, 30)
-        print(order['trade'], order['symbol'], sleep_time)
-        ret_msg = {
-                "status": "FILLED",
-                "orderId": "VIRTUAL",
-                "origQty": order['quantity'],
-                "executedQty": order['quantity'],
-                "cummulativeQuoteQty": order['quantity']
-        }
+        print("action: " + order['trade'] +" " + order['symbol'],"cash: " + str(self.virtual_cash), sleep_time)
+
         time.sleep(sleep_time)
         return ret_msg
     

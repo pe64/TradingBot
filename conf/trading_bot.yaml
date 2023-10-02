@@ -16,6 +16,7 @@ virtual:
   start_time: "20220101111111"
   end_time: "20230930120600"
   sqlite_path: "db_file/virtual.db"
+  cash: 1000
 
 logging:
   format: "%(asctime)s - %(levelname)s - %(message)s"
