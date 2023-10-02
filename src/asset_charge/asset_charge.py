@@ -5,7 +5,7 @@ from db.asset_db import AssetDB
 from http_opt.fund_http import fund_http_real_time_charge
 from utils.redis import Redis
 from http_opt.binance_http import BinanceOpt
-from stock.stock_charge import StockCharge
+from asset_charge.stock_charge import StockCharge
 import threading
 from utils.yaml_conf import yaml_load
 from utils.time_format import TimeFormat

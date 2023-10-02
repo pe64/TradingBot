@@ -4,8 +4,6 @@ class StockCharge:
     def __init__(self, cf):
         self.gconf = cf['stock']
     
-
-    
     def get_stock_charge(self, code, market):
         url = self.gconf['url'] + market + code
         headers = {
