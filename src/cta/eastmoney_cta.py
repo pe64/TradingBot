@@ -27,16 +27,59 @@ class EastMoneyCta:
         self.init_flag = 0
         self.new_asset_flag = 0
         self.ttb_yield = 0
+        self.virtual_flag = cf['virtual']['enabled']
+        self.virtual_cash = cf['virtual']['cash']
         pass
     
     def get_accounts(self):
         return self.accounts
+    
+    def virtual_buy_asset(self, price, cash):
+        if self.virtual_cash > cash:
+            self.virtual_cash = self.virtual_cash - cash
+            ret_msg = {
+                    "status": "FILLED",
+                    "orderId": "VIRTUAL",
+                    "origQty": cash / price,
+                    "executedQty": cash / price,
+                    "cummulativeQuoteQty": cash
+            }
+        else:
+            ret_msg = {
+                "status": "EXPIRED"
+            }
+        return ret_msg
+    
+    def virtual_sell_asset(self, price, quantity):
+        self.virtual_cash = self.virtual_cash + price * quantity
+        return {
+                    "status": "FILLED",
+                    "orderId": "VIRTUAL",
+                    "origQty": quantity, 
+                    "executedQty": quantity,
+                    "cummulativeQuoteQty": quantity * price
+            }
+    
+    def virtual_trade(self, order):
+        if order['trade'] == 'BUY':
+            if order['type'] == 'cash':
+                ret_msg = self.virtual_buy_asset(order['price'], order['quantity'])
+            else:
+                ret_msg = self.virtual_buy_asset(order['price'], order['price'] * order['quantity'])
+        else:
+            if order['type'] == 'asset':
+                ret_msg = self.virtual_sell_asset(order['price'], order['quantity'])
+            else:
+                ret_msg = self.virtual_sell_asset(order['price'], order['quantity'] / order['price'])
+
+        return ret_msg
 
     def run(self, account):
         ret = False
         aid = account['id']
         htp = HttpEM(self.gconf, account)
-        while False == htp.get_validate_key():
+
+        while False == htp.get_validate_key() and self.virtual_flag is False:
             htp.update_cookie()
             time.sleep(10)
             continue
@@ -48,6 +91,10 @@ class EastMoneyCta:
             order = json.loads(message)
             if order['trade'] == 'UPDATE':
                 htp.update_cookie()
+                continue
+
+            if self.virtual_flag:
+                self.virtual_trade(order)
                 continue
 
             asset_str = self.redis_client.GetAssetById(order['asset_id'])
