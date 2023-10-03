@@ -94,7 +94,11 @@ class EastMoneyCta:
                 continue
 
             if self.virtual_flag:
-                self.virtual_trade(order)
+                ret_msg = self.virtual_trade(order)
+                self.redis_client.LPush(
+                    "right#trade#" + str(aid) + '#' + str(order['policy_id']),
+                    json.dumps(ret_msg)
+                )
                 continue
 
             asset_str = self.redis_client.GetAssetById(order['asset_id'])
@@ -139,7 +143,7 @@ class EastMoneyCta:
                     "status": "EXPIRED"
                 }
             self.redis_client.LPush(
-                "right#trade#" + str(aid),
+                "right#trade#" + str(aid) + '#' + str(order['policy_id']),
                 json.dumps(ret_msg)
             )
             

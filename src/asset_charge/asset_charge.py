@@ -100,20 +100,15 @@ class AssetCharge:
         self.upload_asset(funds)
         self.upload_asset(stocks)
         self.upload_asset(coins)
-        if self.virtual_flag:
-            coin_thread = threading.Thread(target=self.fetch_assets, args=(coins, self.fetch_coin_data))
-            coin_thread.start()
-            coin_thread.join()
-        else:
-            fund_thread = threading.Thread(target=self.fetch_assets, args=(funds, self.fetch_fund_data))
-            stock_thread = threading.Thread(target=self.fetch_assets, args=(stocks, self.fetch_stock_data))
-            coin_thread = threading.Thread(target=self.fetch_assets, args=(coins, self.fetch_coin_data))
+        fund_thread = threading.Thread(target=self.fetch_assets, args=(funds, self.fetch_fund_data))
+        stock_thread = threading.Thread(target=self.fetch_assets, args=(stocks, self.fetch_stock_data))
+        coin_thread = threading.Thread(target=self.fetch_assets, args=(coins, self.fetch_coin_data))
 
-            fund_thread.start()
-            stock_thread.start()
-            coin_thread.start()
+        fund_thread.start()
+        stock_thread.start()
+        coin_thread.start()
 
-            fund_thread.join()
-            stock_thread.join()
-            coin_thread.join()
+        fund_thread.join()
+        stock_thread.join()
+        coin_thread.join()
 
