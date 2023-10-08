@@ -10,7 +10,7 @@ class Redis:
         for message in self.pubsub.listen():
             if message['type'] == 'message':
                 if callback:
-                    callback(message['channel'], message['data'], policy)
+                    callback(message['channel'], message['data'], policy, self)
                 else:
                     return message['data']
 
@@ -19,7 +19,7 @@ class Redis:
         for message in self.pubsub.listen():
             if message['type'] == 'pmessage':
                 if callback:
-                    callback(message['channel'], message['data'], policy)
+                    callback(message['channel'], message['data'], policy, self)
                 else:
                     return message['data']
     

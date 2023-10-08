@@ -20,7 +20,9 @@ class EastMoneyCta:
         self.accounts = self.em_sq.get_eastmoney_accounts()
         #for account in self.accounts:
         #    self.em.append(HttpEM(cf, account['arg'], account['id']))
-        self.redis_client = Redis(cf['redis']['url'], cf['redis']['port'])
+        #self.redis_client = Redis(cf['redis']['url'], cf['redis']['port'])
+        self.redis_url = cf['redis']['url']
+        self.redis_port = cf['redis']['port']
         self.gconf=cf
         self.policy = []
         self.today = time.strftime("%Y%m%d", time.localtime())
@@ -78,6 +80,7 @@ class EastMoneyCta:
         ret = False
         aid = account['id']
         htp = HttpEM(self.gconf, account)
+        redis_client = Redis(self.redis_url, self.redis_port)
 
         while False == htp.get_validate_key() and self.virtual_flag is False:
             htp.update_cookie()
@@ -85,7 +88,7 @@ class EastMoneyCta:
             continue
 
         while True:
-            message = self.redis_client.BRPop(
+            message = redis_client.BRPop(
                 "left#trade#" + str(aid),0
             )
             order = json.loads(message)
@@ -95,13 +98,13 @@ class EastMoneyCta:
 
             if self.virtual_flag:
                 ret_msg = self.virtual_trade(order)
-                self.redis_client.LPush(
+                redis_client.LPush(
                     "right#trade#" + str(aid) + '#' + str(order['policy_id']),
                     json.dumps(ret_msg)
                 )
                 continue
 
-            asset_str = self.redis_client.GetAssetById(order['asset_id'])
+            asset_str = redis_client.GetAssetById(order['asset_id'])
             asset = json.loads(asset_str)
 
             if order['trade'] == 'SELL':
@@ -142,7 +145,7 @@ class EastMoneyCta:
                 ret_msg = {
                     "status": "EXPIRED"
                 }
-            self.redis_client.LPush(
+            redis_client.LPush(
                 "right#trade#" + str(aid) + '#' + str(order['policy_id']),
                 json.dumps(ret_msg)
             )

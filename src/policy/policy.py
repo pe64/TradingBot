@@ -21,7 +21,9 @@ class Policy:
         self.policy_db = PolicyDB(db_path)
         self.asset_db = AssetDB(db_path)
         self.policies = self.policy_db.get_policys()
-        self.redis_client = Redis(redis_conf['url'], redis_conf['port'])
+        #self.redis_client = Redis(redis_conf['url'], redis_conf['port'])
+        self.redis_url = redis_conf['url']
+        self.redis_port = redis_conf['port']
         self.threads = []
     
     def create_policy_instance(self, policy_config):
@@ -52,8 +54,8 @@ class Policy:
 
     def run_policy(self, policy):
         subscribe_key = ""
-        asset_str = self.redis_client.GetAssetById(policy.asset_id)
-
+        redis_client = Redis(self.redis_url, self.redis_port)
+        asset_str = redis_client.GetAssetById(policy.asset_id)
         asset = json.loads(asset_str)
         if asset['type'] == "coin":
             subscribe_key = asset['type'] + "#" + \
@@ -65,13 +67,13 @@ class Policy:
                             policy.period + '#' + \
                             asset['symbol']
         while True:
-            self.redis_client.Subscribe(
+            redis_client.Subscribe(
                 subscribe_key, 
                 policy, 
                 callback=self.charge_callback
             )
 
-    def charge_callback(self, channel, charge, exe_policy):
+    def charge_callback(self, channel, charge, exe_policy, redis_client):
         charge_msg = json.loads(charge)
         actions = exe_policy.execute(charge_msg)
         if actions is None:
@@ -79,8 +81,8 @@ class Policy:
 
         for trade_message in actions:
             trade_message['policy_id'] = exe_policy.policy_id
-            self.redis_client.LPush("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
-            back = self.redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 120)
+            redis_client.LPush("left#trade#" + str(exe_policy.account_id), json.dumps(trade_message))
+            back = redis_client.BRPop("right#trade#" + str(exe_policy.account_id) + "#" + str(exe_policy.policy_id), 120)
             if back is None:
                 continue 
         
@@ -90,11 +92,12 @@ class Policy:
             if policy_change is None:
                 continue
 
-            self.redis_client.LPush("policy#database", json.dumps(policy_change))
+            redis_client.LPush("policy#database", json.dumps(policy_change))
     
     def monit_database(self):
+        redis_client = Redis(self.redis_url, self.redis_port)
         while True:
-            policy_change = self.redis_client.BRPop("policy#database", 0)
+            policy_change = redis_client.BRPop("policy#database", 0)
             if policy_change is None:
                 continue
 

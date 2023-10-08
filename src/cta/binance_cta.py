@@ -13,14 +13,18 @@ class BinanceCta:
         self.bn = BinanceOpt(config)
         self.accounts = {}
         self.accounts_db = self.db.get_binance_accounts()
-        self.redis_client = Redis(config['redis']['url'],config['redis']['port'])
+        #self.redis_client = Redis(config['redis']['url'],config['redis']['port'])
+        self.redis_url = config['redis']['url']
+        self.redis_port = config['redis']['port']
+        redis_client = Redis(self.redis_url, self.redis_port)
         self.exchange_info = {}
         self.virtual_flag = config['virtual']['enabled']
         self.virtual_cash = config['virtual']['cash']
 
         for account in self.accounts_db:
             self.accounts["account_" + str(account['id'])] = account
-            self.update_account(account['id'])
+            ret = self.update_account(account['id'])
+            redis_client.Set("binance#" + str(account['id']), json.dumps(ret))
         
         info = self.bn.get_exchange_info()
 
@@ -80,10 +84,11 @@ class BinanceCta:
         return ret_msg
     
     def run(self, account):
+        redis_client = Redis(self.redis_url, self.redis_port)
         ret_msg = {"status":"EXPIRED"}
         account_id = account['id']
         while True:
-            message = self.redis_client.BRPop(
+            message = redis_client.BRPop(
                 "left#trade#" + 
                 str(account_id),
                 0
@@ -97,9 +102,10 @@ class BinanceCta:
             elif order['trade'] == "BUY":
                 ret_msg = self.buy_sopt_asset(order, account_id) 
             else:
-                self.update_account(str(account_id))
-
-            self.redis_client.LPush("right#trade#" + str(account_id) + "#" + str(order['policy_id']), json.dumps(ret_msg))
+                ret_msg = self.update_account(str(account_id))
+                redis_client.Set("binance#" + str(account_id), json.dumps(account))
+            
+            redis_client.LPush("right#trade#" + str(account_id) + "#" + str(order['policy_id']), json.dumps(ret_msg))
         
 
     def round_quantity(self, symbol, quantity, price):
@@ -112,7 +118,7 @@ class BinanceCta:
                 min_qty = float(self.exchange_info[symbol]['LOT_SIZE']['minQty'])
                 original_quantity = round(original_quantity / min_qty) * min_qty
 
-            return round(original_quantity, quote_asset_precision)
+            return round(original_quantity, quote_asset_precision), quote_asset_precision
 
         return None   
 
@@ -128,11 +134,11 @@ class BinanceCta:
                 api_secret
             )
         elif order['type'] == 'cash':
-            quantity = self.round_quantity(order['symbol'], order['quantity'], order['price'])
+            quantity, pcs = self.round_quantity(order['symbol'], order['quantity'], order['price'])
             order_msg = self.bn.sell_limit_order(
                 order['symbol'], 
                 quantity, 
-                order['price'],
+                float(order['price']),
                 api_key, 
                 api_secret
             )
@@ -160,11 +166,12 @@ class BinanceCta:
                 api_secret
             )
         elif order['type'] == 'cash':
-            quantity = self.round_quantity(order['symbol'], order['quantity'], order['price'])
+            quantity, pcs = self.round_quantity(order['symbol'], order['quantity'], order['price'])
+            price = "{:.{}f}".format(order['price'], pcs)
             order_msg = self.bn.buy_limit_order(
                 order['symbol'],
                 quantity,
-                order['price'],
+                price,
                 api_key,
                 api_secret
             )
@@ -211,4 +218,4 @@ class BinanceCta:
                 }
 
         self.accounts['account_' + str(account_id)]['asset'] = account
-        self.redis_client.Set("binance#" + str(account_id), json.dumps(account))
+        return account
