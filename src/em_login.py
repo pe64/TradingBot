@@ -20,7 +20,19 @@ if __name__ == "__main__":
                     htp.login_em_ver_code()
                     htp.login_em_platform()
                     rds.UpdateEastMoneyCookies(htp.account_id)
+
+                print("\033[33m账户:%s 登陆成功\033[0m"%(htp.get_user_id()),end="|")
+                ret = htp.get_asset()
+                for node in ret:
+                    if node['Ljyk'] is None:
+                        print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:0元.\033[0m"%(node['Zzc'],node['Kyzj'])) 
+                    elif float(node['Ljyk']) > 0:
+                        print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:\033[32m%s\033[33m元.\033[0m"%(node['Zzc'],node['Kyzj'],node['Ljyk'])) 
+                    elif  float(node['Ljyk']) < 0:
+                        print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:\033[31m%s\033[33m元.\033[0m"%(node['Zzc'],node['Kyzj'],node['Ljyk'])) 
+
             except Exception as e:
                 print("error:", e)
                 continue
+        
         time.sleep(60)     
