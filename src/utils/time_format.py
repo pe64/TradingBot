@@ -77,6 +77,11 @@ class TimeFormat:
         # 将UTC时间转换为中国的当地时间
         local_time = current_utc_time.astimezone(pytz.timezone('Asia/Shanghai'))
         return local_time.strftime("%Y%m%d%H%M%S")
+    
+    @staticmethod
+    def get_local_timstamp():
+        current_time = datetime.now()
+        return current_time.strftime("%Y%m%d%H%M%S")
 
     @staticmethod
     def parse_time(time_info, target_time_str):

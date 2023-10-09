@@ -3,6 +3,7 @@ from utils.yaml_conf import yaml_load
 from cta.eastmoney_cta import EastMoneyCta
 from http_opt.eastmoney import HttpEM
 from utils.redis import Redis
+from utils.time_format import TimeFormat
 
 if __name__ == "__main__":
     cf = yaml_load()
@@ -28,7 +29,7 @@ if __name__ == "__main__":
                     rds.UpdateEastMoneyCookies(htp.account_id)
                     status, data = htp.get_asset()
 
-                print("\033[33m账户:%s 登陆成功\033[0m"%(htp.get_user_id()),end="|")
+                print("\033[33m[%s]账户:%s 登陆成功\033[0m"%(TimeFormat.get_local_timstamp(),htp.get_user_id()),end="|")
                 for node in data:
                     if node['Ljyk'] is None:
                         print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:0元.\033[0m"%(node['Zzc'],node['Kyzj'])) 
