@@ -449,11 +449,7 @@ class HttpEM:
         data = {}
         js = self.http_post(url, data, headers)
 
-        if js["Status"] == 0:
-            return js['Data']
-        else:
-            print("get asset errror %s", js["Message"])
-            return []
+        return js["Status"], js['Data']
 
     def get_ttb_code(self):
         url = self.ttb_code_conf['url']

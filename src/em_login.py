@@ -21,9 +21,15 @@ if __name__ == "__main__":
                     htp.login_em_platform()
                     rds.UpdateEastMoneyCookies(htp.account_id)
 
+                status, data = htp.get_asset()
+                if status == -2:
+                    htp.login_em_ver_code()
+                    htp.login_em_platform()
+                    rds.UpdateEastMoneyCookies(htp.account_id)
+                    status, data = htp.get_asset()
+
                 print("\033[33m账户:%s 登陆成功\033[0m"%(htp.get_user_id()),end="|")
-                ret = htp.get_asset()
-                for node in ret:
+                for node in data:
                     if node['Ljyk'] is None:
                         print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:0元.\033[0m"%(node['Zzc'],node['Kyzj'])) 
                     elif float(node['Ljyk']) > 0:
