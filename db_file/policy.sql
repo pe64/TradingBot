@@ -45,6 +45,7 @@ INSERT INTO policy (id, account_id, enabled, asset_id, type, cash, cash_into, ca
 INSERT INTO policy (id, account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES (22, 2, 1, 10, 'autobuy', '10000.0', '0.0', '0.0', '{"period":"1d","type":"cash","count":100.0}', '0.0', '20231009132400', '{"start_time": {"time": "14:30"},"end_time": {"time": "14:55"}}');
 INSERT INTO policy (id, account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES (23, 2, 1, 11, 'autobuy', '10000.0', '0.0', '0.0', '{"period":"1d","type":"cash","count":100.0}', '0.0', '20231009132500', '{"start_time": {"time": "14:30"},"end_time": {"time": "14:55"}}');
 INSERT INTO policy (id, account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES (24, 2, 1, 12, 'autobuy', '10000.0', '0.0', '0.0', '{"period":"1d","type":"cash","count":100.0}', '0.0', '20230928144235', '{"start_time": {"time": "14:30"},"end_time": {"time": "14:55"}}');
+INSERT INTO policy (id, account_id, enabled, asset_id, type, cash, cash_into, cash_inuse, condition, asset_count, timestamp, execution_time) VALUES (25, 2, 1, 9, 'autobuy', '10000.0', '0.0', '0.0', '{"period":"1d","type":"cash","count":100.0}', '0.0', '20230928144235', '{"start_time": {"time": "14:30"},"end_time": {"time": "14:55"}}');
 
 COMMIT TRANSACTION;
 PRAGMA foreign_keys = on;

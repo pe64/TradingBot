@@ -142,6 +142,7 @@ class HttpEM:
             print("login success %s."%str(datetime.datetime.now()))
             self.cookie.save(filename=self.cookie_path,ignore_discard=True, ignore_expires=True)
             os.rename(path, str(path).replace("vercode"+str(self.account_id), self.login_js['identifyCode']))
+            return js['Status']
         else:
             print("login error.")
         pass

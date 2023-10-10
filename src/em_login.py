@@ -5,6 +5,13 @@ from http_opt.eastmoney import HttpEM
 from utils.redis import Redis
 from utils.time_format import TimeFormat
 
+def login_and_update_cookies(htp, rds):
+    htp.login_em_ver_code()
+    ret = htp.login_em_platform()
+    rds.UpdateEastMoneyCookies(htp.account_id)
+
+    return ret == 0
+
 if __name__ == "__main__":
     cf = yaml_load()
     em = EastMoneyCta(cf)
@@ -21,6 +28,7 @@ if __name__ == "__main__":
                     htp.login_em_ver_code()
                     htp.login_em_platform()
                     rds.UpdateEastMoneyCookies(htp.account_id)
+
 
                 status, data = htp.get_asset()
                 if status == -2:
