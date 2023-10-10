@@ -64,11 +64,11 @@ class TimeFormat:
     @staticmethod
     def get_time_delta(period):
         if period == '8h':
-            return timedelta(hours=7,minutes=59)
+            return timedelta(hours=7,minutes=55)
         elif period == '1d':
-            return timedelta(hours=23, minutes=59)
+            return timedelta(hours=23, minutes=55)
         elif period == '1w':
-            return timedelta(days=6, hours=23, minutes=59)
+            return timedelta(days=6, hours=23, minutes=55)
         else:
             return timedelta(minutes=1)
     
