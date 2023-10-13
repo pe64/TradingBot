@@ -43,6 +43,16 @@
             "cwd":"${workspaceFolder}",
             "justMyCode": true,
             "args": ["redis"]
+        },
+        {
+            "name": "image.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/image.py",
+            "console": "integratedTerminal",
+            "cwd":"${workspaceFolder}",
+            "justMyCode": true,
+            "args": ["redis"]
         }
     ]
 }
