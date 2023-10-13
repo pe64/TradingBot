@@ -36,6 +36,9 @@ class Redis:
             return data
         return None
     
+    def LTrim(self, key):
+        self.r.ltrim(key, 0, 0)
+    
     def Set(self, key, value):
         self.r.set(key, value)
 
