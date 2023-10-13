@@ -82,6 +82,7 @@ class EastMoneyCta:
         htp = HttpEM(self.gconf, account)
         redis_client = Redis(self.redis_url, self.redis_port)
         redis_client.LTrim("left#trade#" + str(aid))
+        redis_client.LTrim("right#trade#" + str(aid))
 
         while False == htp.get_validate_key() and self.virtual_flag is False:
             htp.update_cookie()

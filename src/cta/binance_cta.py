@@ -26,6 +26,7 @@ class BinanceCta:
             ret = self.update_account(account['id'])
             redis_client.Set("binance#" + str(account['id']), json.dumps(ret))
             redis_client.LTrim("left#trade#" + str(account['id']))
+            redis_client.LTrim("right#trade#" + str(account['id']))
         
         info = self.bn.get_exchange_info()
 
