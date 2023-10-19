@@ -27,6 +27,7 @@ class BinanceCta:
             redis_client.Set("binance#" + str(account['id']), json.dumps(ret))
             redis_client.LTrim("left#trade#" + str(account['id']))
             redis_client.LTrim("right#trade#" + str(account['id']))
+            self.accounts["account_" + str(account['id'])]['asset'] = ret
         
         info = self.bn.get_exchange_info()
 
@@ -89,6 +90,7 @@ class BinanceCta:
         redis_client = Redis(self.redis_url, self.redis_port)
         ret_msg = {"status":"EXPIRED"}
         account_id = account['id']
+        asset = account['asset']
         while True:
             message = redis_client.BRPop(
                 "left#trade#" + 
