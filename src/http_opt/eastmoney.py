@@ -30,6 +30,7 @@ class HttpEM:
         self.fund_revoke_orders_conf = cf['eastmoney']['fund_revoke_orders']
         self. stock_get_revokes_conf = cf['eastmoney']['stock_get_revokes']
         self.get_fund_position_conf = cf['eastmoney']['get_fund_position']
+        self.get_fund_asset_conf = cf['eastmoney']['get_fund_asset']
         self.stock_revoke_order_conf = cf['eastmoney']['stock_revoke_order']
         self.stock_submit_trade_conf = cf['eastmoney']['stock_submit_trade']
         self.stock_list_conf = cf['eastmoney']['stock_list']
@@ -278,6 +279,17 @@ class HttpEM:
         else :
             print("revoke order error [%s]"%js['Message'])
     
+    def get_fund_asset(self):
+        url = self.get_fund_asset_conf['url'] + self.validatekey
+        headers = self.build_headers(self.get_fund_asset_conf['headers'])
+        data = {
+            "validatekey": self.validatekey
+        }
+
+        js = self.http_post(url, arg=data, headers=headers)
+        
+        return js['Status'], js["Data"]
+
     def get_fund_position(self):
         url = self.get_fund_position_conf["url"] + self.validatekey
         headers = self.build_headers(self.get_fund_position_conf['headers'])

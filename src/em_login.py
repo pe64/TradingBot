@@ -36,6 +36,13 @@ if __name__ == "__main__":
                     htp.login_em_platform()
                     rds.UpdateEastMoneyCookies(htp.account_id)
                     status, data = htp.get_asset()
+                
+                status, fund = htp.get_fund_asset()
+                if status != 0:
+                    htp.login_em_ver_code()
+                    htp.login_em_platform()
+                    rds.UpdateEastMoneyCookies(htp.account_id)
+                    status, fund = htp.get_fund_asset()
 
                 print("\033[33m[%s]账户:%s 登陆成功\033[0m"%(TimeFormat.get_local_timstamp(),htp.get_user_id()),end="|")
                 for node in data:
