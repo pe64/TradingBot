@@ -289,6 +289,7 @@ class EastMoneyCta:
         else:
             print("今日无新债可申购.")
 
+        em.new_stock_flag = True
         return ret
 
     def update_account_status(self, em):

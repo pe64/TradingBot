@@ -61,6 +61,10 @@ if __name__ == "__main__":
                     elif float(f['Jjyk']) < 0:
                         print("\033[33m基金盈亏:\033[31m%s\033[33m元.\033[0m"%(f['Jjyk']))
                     pass
+
+                if htp.new_stock_flag is False:
+                    em.submit_new_asset(htp)
+
             except Exception as e:
                 print("error:", e)
                 continue
