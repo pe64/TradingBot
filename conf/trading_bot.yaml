@@ -57,8 +57,8 @@ period:
 
 web_api:
   fund:
-    url: "http://fund.rabt.top"
-    path: "/api/js/"
+    url: "https://fundgz.1234567.com.cn"
+    path: "/js/"
     all_fund_url: "https://fund.eastmoney.com/js/fundcode_search.js"
     headers: 
       accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
