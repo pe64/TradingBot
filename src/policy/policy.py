@@ -28,20 +28,18 @@ class Policy:
     
     def create_policy_instance(self, policy_config):
         policy_type = policy_config["type"]
-        if policy_type == "autobuy":
-            return AutoBuy(policy_config)
-        elif policy_type == "autosale":
-            return AutoSale(policy_config)
-        elif policy_type == "balance":
-            return Balance(policy_config)
-        elif policy_type == "gerd":
-            return Gerd(policy_config)
-        elif policy_type == "martin":
-            return Martin(policy_config)
-        elif policy_type == "open":
-            return OpenPst(policy_config)
-        elif policy_type == "bond":
-            return Bond(policy_config)
+        policy_class_map = {
+            "autobuy": AutoBuy,
+            "autosale": AutoSale,
+            "balance": Balance,
+            "gerd": Gerd,
+            "martin": Martin,
+            "open": OpenPst,
+            "bond": Bond
+        }
+        policy_class = policy_class_map.get(policy_type)
+        if policy_class:
+            return policy_class(policy_config)
         else:
             raise ValueError(f"Unsupported policy type: {policy_type}")
     
