@@ -27,8 +27,22 @@ def stock_http_history_charge(conf, fcode):
     url = url + str(int(ts))
 
     headers = build_headers(conf["headers"])
-    req = request.Request(url, headers=headers)
+    req = request.Request(url)
     resp = request.urlopen(req).read().decode('utf-8')
-    start = resp[19:-2]
-    ret = json.loads(start)
+    ret = json.loads(resp)
+    return ret
+
+def stock_http_get_code_list(conf):
+    url = conf['url'] + \
+        conf['path'] + "?"
+    for arg in conf["arguments"]:
+        url = url + arg +"&"
+
+    url = url +"_="
+    ts = time.time()
+    url = url + str(int(ts))
+    
+    req = request.Request(url)
+    resp = request.urlopen(req).read().decode('utf-8')
+    ret = json.loads(resp)
     return ret
