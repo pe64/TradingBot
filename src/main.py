@@ -17,7 +17,7 @@ from http_opt.eastmoney import HttpEM
 from cta.eastmoney_cta import EastMoneyCta
 from utils.redis import Redis
 from http_opt.binance_http import BinanceOpt
-from ocr.ocr import *
+#from ocr.ocr import *
 
 def fund51_cta_daemon(*add):
     cf = yaml_load()
@@ -39,20 +39,32 @@ def main(argv):
         if argv[2] == "real":
             pass
         elif argv[2] == "history":
-            fund_sq = SqliteObj(cf["sqlite_path"]["fund"])
-            stock_sq = SqliteObj(cf["sqlite_path"]["stock"])
+            fund_sq = SqliteObj(cf["sqlite_path"])
+            stock_sq = SqliteObj(cf["sqlite_path"])
             fcodes = fund_sq.get_fund_self_selections()
             for fcode in fcodes:
                 his = fund_http.fund_http_history_charge(cf["web_api"]["fund"], fcode[0])
                 fund_sq.insert_fund_history_charges(his, fcode=fcode[0])
-                js = fund_http.fund_http_real_time_charge(cf["web_api"]["fund"],fcode[0])
-                fund_sq.update_fund_real_time_charge(fcode[0], js)
+                #js = fund_http.fund_http_real_time_charge(cf["web_api"]["fund"],fcode[0])
+                #fund_sq.update_fund_real_time_charge(fcode[0], js)
+
+            #stock_list = stock_http.stock_http_get_code_list(cf['web_api']['stock_list'])
+            #if stock_list.get('data') and stock_list['data'].get('diff') and len(stock_list['data']['diff']) != 0:
+            #    for node in stock_list['data']['diff']:
+            #        if node["f12"][:3] in cf['web_api']['stock_list']['market']["sh"]:
+            #            stock_sq.insert_stock_list(node['f12'], node['f14'], "sh")
+            #        if node["f12"][:3] in cf['web_api']['stock_list']['market']["sz"]:
+            #            stock_sq.insert_stock_list(node['f12'], node['f14'], "sz")
 
             stocks = stock_sq.get_stock_self_selection()
             for stock in stocks:
-                scode = cf["web_api"]["stock"]["market"][stock[1]] + "." + stock[0]
-                his = stock_http.stock_http_history_charge(cf["web_api"]["stock"], scode)
-                stock_sq.insert_stock_history_charge(his["data"]["klines"], stock[0])
+                scode = cf["web_api"]['stock']['market_code'][stock[1]] + "." + stock[0]
+                his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "day")
+                stock_sq.insert_stock_kline(his["data"]["klines"], stock[0], "day")
+                his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "week")
+                stock_sq.insert_stock_kline(his["data"]["klines"], stock[0], "week")
+                his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "month")
+                stock_sq.insert_stock_kline(his["data"]["klines"], stock[0], "month")
 
             pass
         pass

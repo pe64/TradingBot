@@ -16,31 +16,31 @@ class SqliteObj:
         return rows
 
     def get_fund_self_selections(self):
-        self.cur.execute("SELECT fcode FROM self_select")
+        self.cur.execute('SELECT symbol FROM asset WHERE type = "fund"')
         rows = self.cur.fetchall()
         return rows
 
     def get_fund_last_history_charge_date(self, fcode):
         try:
-            cmd ="SELECT fsrq FROM f%s ORDER BY id DESC LIMIT 1"%fcode 
+            cmd ="SELECT fsrq FROM f%s ORDER BY fsrq DESC LIMIT 1"%fcode 
             self.cur.execute(cmd)
             rows = self.cur.fetchall()
             return rows[0][0]
         except:
             return None
 
-    def get_stock_last_history_charge_date(self, scode):
+    def get_stock_last_klines(self, scode, type):
         try:
-            cmd ="SELECT fsrq FROM sday%s ORDER BY id DESC LIMIT 1"%scode 
+            cmd ="SELECT fsrq FROM s%s%s ORDER BY fsrq DESC LIMIT 1"%(type,scode)
             self.cur.execute(cmd)
             rows = self.cur.fetchall()
             return rows[0][0]
         except:
             return None
-
-    def get_stock_history_charge_by_date(self, scode, date):
+    
+    def get_stock_history_charge_by_date(self, scode, date, type):
         try:
-            cmd = 'SELECT end_charge, zhang_f FROM sday%s WHERE fsrq == "%s"'%(scode, date) 
+            cmd = 'SELECT end_charge, zhang_f FROM s%s%s WHERE fsrq == "%s"'%(type, scode, date) 
             self.cur.execute(cmd)
             rows = self.cur.fetchall()
             return rows[0][0], rows[0][1]
@@ -73,25 +73,25 @@ class SqliteObj:
     def create_fund_history_table(self, fcode):
         try:
             self.cur.execute("CREATE TABLE f%s (id INTEGER PRIMARY KEY, fsrq DATE NOT NULL, dwjz FLOAT NOT NULL, jzzzl FLOAT);"%fcode)
+            self.conn.commit()
         except:
             pass
         pass
     
-    def create_stock_history_table(self, scode):
+    def create_stock_history_table(self, scode, type):
         try:
-            cmd = "CREATE TABLE sday%s (id INTEGER PRIMARY KEY, fsrq DATE NOT NULL, start_charge FLOAT , end_charge FLOAT, max_charge FLOAT, min_charge FLOAT, cjl INTEGER, cjr FLOAT, zhen_f FLOAT, zhang_f FLOAT, hsl FLOAT);"%scode
+            cmd = "CREATE TABLE s%s%s (id INTEGER PRIMARY KEY, fsrq DATE NOT NULL, start_charge FLOAT , end_charge FLOAT, max_charge FLOAT, min_charge FLOAT, cjl INTEGER, cjr FLOAT, zhen_f FLOAT, zhang_f FLOAT, hsl FLOAT);"%(type, scode)
             self.cur.execute(cmd)
         except:
             pass
 
     def insert_fund_history_charges(self, his, fcode):
         today = time.strftime("%Y-%m-%d", time.localtime())
-        arr = json.loads(his).get("Datas")
+        arr = his.get("Data").get("LSJZList")
 
         date = self.get_fund_last_history_charge_date(fcode)
         if date is None:
             self.create_fund_history_table(fcode) 
-            self.conn.commit()
             ts1 = time.strptime("1990-1-1", "%Y-%m-%d")
         else:
             ts1 = time.strptime(date,"%Y-%m-%d")
@@ -105,12 +105,12 @@ class SqliteObj:
                     self.cur.execute('INSERT INTO f%s (fsrq, dwjz, jzzzl) VALUES ("%s", %s, %s);'%(fcode, node["FSRQ"], node["DWJZ"], node["JZZZL"]))
 
                 self.conn.commit()
-
-    def insert_stock_history_charge(self, his, scode):
+    
+    def insert_stock_kline(self, his, scode, type):
         today = time.strftime("%Y-%m-%d", time.localtime())
-        date = self.get_stock_last_history_charge_date(scode)
+        date = self.get_stock_last_klines(scode, type)
         if date is None:
-            self.create_stock_history_table(scode) 
+            self.create_stock_history_table(scode, type) 
             self.conn.commit()
             ts1 = time.strptime("1990-1-1", "%Y-%m-%d")
         else:
@@ -120,9 +120,10 @@ class SqliteObj:
             val = node.split(',')
             ts2 = time.strptime(val[0], "%Y-%m-%d")
             if ts2 > ts1 and val[0] != today:
-                self.cur.execute('INSERT INTO sday%s (fsrq, start_charge, end_charge, max_charge, min_charge, cjl, cjr, zhen_f, zhang_f, hsl) VALUES ' 
+                cmd ='INSERT INTO s%s%s (fsrq, start_charge, end_charge, max_charge, min_charge, cjl, cjr, zhen_f, zhang_f, hsl) VALUES ' \
                             '("%s", %s, %s, %s, %s, %s, %s, %s, %s, %s);' \
-                            %(scode, val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7], val[8], val[10]))
+                            %(type, scode, val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7], val[8], val[10])
+                self.cur.execute(cmd)
 
                 self.conn.commit()
 
@@ -141,5 +142,22 @@ class SqliteObj:
             self.cur.execute(cmd)
             self.conn.commit()
 
-def get_fund_last_history_charge_list(db_path, scode, start_date, end_date):
-    pass
+    def get_stock_masum(self, code, type, num):
+        cmd = "SELECT id,end_charge FROM s%s%s ORDER BY fsrq DESC LIMIT %d"%(type, code, num)
+        self.cur.execute(cmd)
+        rows = self.cur.fetchall()
+        sum = 0.0
+        for row in rows:
+            sum += float(row[1])
+        
+        return sum
+
+    def get_fund_masum(self, code, num):
+        cmd = "SELECT id,dwjz,fsrq FROM f%s ORDER BY fsrq DESC LIMIT %s"%(code, num)
+        self.cur.execute(cmd)
+        rows = self.cur.fetchall()
+        sum = 0.0
+        for row in rows:
+            sum += float(row[1])
+        
+        return sum

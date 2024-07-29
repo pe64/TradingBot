@@ -15,12 +15,23 @@ def build_headers(conf_head):
     }
     return headers
 
-def stock_http_history_charge(conf, fcode):
+
+def stock_http_kline(conf, fcode, type):
+
+    klt = {
+        "day": "101",
+        "week": "102",
+        "month": "103"
+    }
+
     url = conf["url"] + \
         conf["path"] + "?secid=" + \
         fcode + "&"
+
     for arg in conf["arguments"]:
         url = url + arg + "&"
+    
+    url = url + "klt=" + klt[type] + "&"
     
     url = url +"_="
     ts = time.time()
@@ -46,3 +57,24 @@ def stock_http_get_code_list(conf):
     resp = request.urlopen(req).read().decode('utf-8')
     ret = json.loads(resp)
     return ret
+
+def stock_http_real_time_charge(conf, scode, market):
+    url = conf['charge_url'] + \
+        conf['charge_path'] + "?" 
+    
+    for arg in conf['charge_args']:
+        url = url + arg + "&"
+        
+    url = url + "secid=" + conf['market_code'][market] +'.' + scode +"&"
+
+    url = url +"_="
+    ts = time.time()
+    url = url + str(int(ts))
+
+    req = request.Request(url)
+    resp = request.urlopen(req).read().decode('utf-8')
+    ret = json.loads(resp)
+    if ret["rc"] == 0:
+        return ret['data']
+    else:
+        return None

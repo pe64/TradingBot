@@ -62,9 +62,9 @@ def fund_http_real_time_charge(conf, fcode):
         return None
 
 def fund_http_history_charge(conf, fcode):
-    url = conf["url"] + conf["path"] + conf["history_charge"]["file"] + '?FCODE=' + fcode + '&' 
+    url = conf["his_url"] + conf["his_path"] + '?fundCode=' + fcode + '&' 
 
-    for arg in conf["history_charge"]["arguments"] :
+    for arg in conf["his_args"]:
         url = url + arg + "&"
         
     url = url +"_="
@@ -73,9 +73,14 @@ def fund_http_history_charge(conf, fcode):
 
     url = url + str(int(ts))
     headers = build_headers(conf["headers"])
+    headers['Referer'] = "https://fundf10.eastmoney.com/"
     req = request.Request(url, headers=headers)
     response = request.urlopen(req)
-    return response.read().decode('utf-8')
+    ret = response.read().decode('utf-8')
+    if ret != None:
+        return json.loads(ret)
+    else:
+        return None
 
 def fund_http_get_all_fund(conf):
     url = conf["all_fund_url"]

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import time
 import pytz
+import json
 
 class TimeFormat:
     def __init__(self) -> None:
@@ -14,6 +15,11 @@ class TimeFormat:
             dt_format = "%Y-%m-%d %H:%M"
         dt = datetime.strptime(input_str, dt_format)
         return dt.strftime("%Y%m%d%H%M%S")
+    
+    @staticmethod
+    def transform_datatime_from_timestamp(input_str):
+        dt = datetime.fromtimestamp(input_str)
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
     
     @staticmethod
     def get_utc_time(time_str = None, days=0):
@@ -134,3 +140,43 @@ class TimeFormat:
             return False
         except (KeyError, ValueError):
             return False  # 配置信息无效或缺失时返回False
+
+    @staticmethod
+    def stock_check_intime(timestamp, rangestr):
+        dt = datetime.fromtimestamp(timestamp)
+        time_ranges = json.loads(rangestr)
+        dt_int = int(dt.strftime("%Y%m%d%H%M"))
+        in_range = False
+        for range_item in time_ranges:
+            if range_item['b'] <= dt_int <= range_item['e']:
+                in_range = True
+                break
+        
+        return in_range
+    
+    @staticmethod
+    def is_today(input_time_str):
+        try:
+          input_time = datetime.strptime(input_time_str, "%Y%m%d%H%M%S")
+          today = datetime.now()
+          return input_time.date() == today.date()
+        except ValueError:
+          return False
+    
+    @staticmethod
+    def is_time_between(input_time_str, start_time_str, end_time_str):
+        try:
+          input_time = datetime.strptime(input_time_str, "%Y%m%d%H%M%S")
+          start_time = datetime.strptime(start_time_str, "%H:%M")
+          end_time = datetime.strptime(end_time_str, "%H:%M")
+        except ValueError:
+          return False
+
+        if input_time.date() == start_time.date() == end_time.date():
+          return start_time.time() <= input_time.time() < end_time.time()
+
+        if start_time.time() < end_time.time():
+          return start_time.time() <= input_time.time() < end_time.time()
+        else:
+          return (start_time.time() <= input_time.time() or 
+                  input_time.time() < end_time.time())

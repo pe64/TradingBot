@@ -55,10 +55,21 @@ period:
   new_asset:
     start: "11:00"
     end: "11:30"
+  kline:
+    start: "1:00"
+    end: "2:00"
 
 web_api:
   fund:
     url: "http://fundgz.1234567.com.cn"
+    his_url: "http://api.fund.eastmoney.com"
+    his_path: "/f10/lsjz"
+    his_args: [
+      "pageIndex=1",
+      "pageSize=0",
+      "startDate=",
+      "endDate="
+    ]
     path: "/js/"
     all_fund_url: "https://fund.eastmoney.com/js/fundcode_search.js"
     headers: 
@@ -66,6 +77,7 @@ web_api:
       accept_language: "zh-CN,zh;q=0.9"
       cache_control: "no-cache"
       connection: "keep-alive"
+      Referer: "https://fundf10.eastmoney.com/"
       pragma: "no-cache"
       sec_fetch_dest: "empty"
       sec_fetch_mode: "cors"
@@ -101,14 +113,23 @@ web_api:
       arguments: "conf/login.json"
   stock:
     url: "http://push2his.eastmoney.com"
+    charge_url: "http://push2.eastmoney.com"
+    charge_path: "/api/qt/stock/get"
     path: "/api/qt/stock/kline/get"
-    market:
+    market_code:
       sz: "0"
       sh: "1"
+    market:
+      sh: ["600", "601", "603", "605", "688"]
+      sz: ["000", "001", "002", "003", "004", "300", "301"]
+    charge_args: [
+      "invt=2",
+      "fltt=2",
+      "fields=f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f55,f57,f58,f59,f60,f80,f86"
+    ]
     arguments: [
       "fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13",
       "fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
-      "klt=101",
       "rtntype=6",
       "fqt=0",
       "beg=0",
@@ -129,6 +150,7 @@ web_api:
   stock_list:
     url: "http://push2.eastmoney.com"
     path: "/api/qt/clist/get"
+    charge_path: "/api/qt/stock/get"
     market:
       sh: ["600", "601", "603", "605", "688"]
       sz: ["000", "001", "002", "003", "004", "300", "301"]
@@ -143,6 +165,11 @@ web_api:
       "fid=f3",
       "fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
       "fields=f12,f14"
+    ]
+    charge_args: [
+      "invt=2",
+      "fltt=2",
+      "fields=f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f55,f57,f58,f59,f60"
     ]
 
 fund51:
