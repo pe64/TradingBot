@@ -180,3 +180,23 @@ class TimeFormat:
         else:
           return (start_time.time() <= input_time.time() or 
                   input_time.time() < end_time.time())
+    
+    @staticmethod
+    def is_first_day_of_week(date_string):
+        # 将日期字符串转换为datetime对象
+        date = datetime.strptime(date_string, "%Y%m%d%H%M%S")
+    
+        # 获取当前日期是星期几（0表示星期一，6表示星期日）
+        weekday = date.weekday()
+    
+        # 如果是星期一（weekday == 0），则返回True，否则返回False
+        return weekday == 0
+
+    @staticmethod
+    def is_first_day_of_month(date_string):
+        # 将日期字符串转换为datetime对象
+        date = datetime.strptime(date_string, "%Y%m%d%H%M%S")
+    
+        # 检查日期是否为1号
+        return date.day == 1 
+ 

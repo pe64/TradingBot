@@ -59,6 +59,7 @@ def upload_stock_masum(sql, rd):
 
 def update_stock_kline(cf, sql_handel):
     stocks = sql_handel.get_stock_self_selection()
+    local_time = TimeFormat.get_local_timstamp()
     for stock in stocks:
         scode = cf["web_api"]['stock']['market_code'][stock[1]] + "." + stock[0]
         his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "day")
