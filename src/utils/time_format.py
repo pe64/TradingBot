@@ -199,4 +199,12 @@ class TimeFormat:
     
         # 检查日期是否为1号
         return date.day == 1 
- 
+    @staticmethod
+    def format_date(date_string):
+        # 将输入的日期字符串解析为datetime对象
+        date = datetime.strptime(date_string, "%Y-%m-%d")
+    
+        # 将datetime对象格式化为所需的输出格式
+        formatted_date = date.strftime("%Y%m%d")
+    
+        return formatted_date

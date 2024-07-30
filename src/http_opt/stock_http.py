@@ -16,7 +16,7 @@ def build_headers(conf_head):
     return headers
 
 
-def stock_http_kline(conf, fcode, type):
+def stock_http_kline(conf, fcode, type, beg, end):
 
     klt = {
         "day": "101",
@@ -32,6 +32,8 @@ def stock_http_kline(conf, fcode, type):
         url = url + arg + "&"
     
     url = url + "klt=" + klt[type] + "&"
+    url = url + "beg=" + beg + "&"
+    url = url + "end=" + end + "&"
     
     url = url +"_="
     ts = time.time()
