@@ -64,10 +64,12 @@ def update_stock_kline(cf, sql_handel):
         scode = cf["web_api"]['stock']['market_code'][stock[1]] + "." + stock[0]
         his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "day")
         sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "day")
-        his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "week")
-        sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "week")
-        his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "month")
-        sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "month")
+        if TimeFormat.is_first_day_of_week(local_time):
+            his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "week")
+            sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "week")
+        if TimeFormat.is_first_day_of_month(local_time):
+            his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "month")
+            sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "month")
 
 
 def main():

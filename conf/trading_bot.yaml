@@ -56,8 +56,8 @@ period:
     start: "11:00"
     end: "11:30"
   kline:
-    start: "23:00"
-    end: "23:59"
+    start: "01:00"
+    end: "01:59"
 
 web_api:
   fund:
