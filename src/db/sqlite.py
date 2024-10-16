@@ -144,11 +144,14 @@ class SqliteObj:
 
     def get_stock_masum(self, code, type, num):
         cmd = "SELECT id,end_charge FROM s%s%s ORDER BY fsrq DESC LIMIT %d"%(type, code, num)
-        self.cur.execute(cmd)
-        rows = self.cur.fetchall()
         sum = 0.0
-        for row in rows:
-            sum += float(row[1])
+        try:
+            self.cur.execute(cmd)
+            rows = self.cur.fetchall()
+            for row in rows:
+                sum += float(row[1])
+        except:
+            sum = 0.0
         
         return sum
 

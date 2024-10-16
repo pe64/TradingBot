@@ -26,6 +26,7 @@ class AssetCharge:
         self.stock = StockCharge(cf)
     
     def fetch_fund_data(self, rd, fund, days =0):
+        periods = [4, 9, 19, 29, 59, 119]
         ret = fund_http_real_time_charge(self.gconf['web_api']['fund'], fund['symbol'])
         if ret is not None:
             charge = {
@@ -37,6 +38,14 @@ class AssetCharge:
                 "percent": float(ret["gszzl"]),
                 "timestamp": TimeFormat.transform_datatime_format(ret["gztime"])
             }
+            result = rd.Get("fund#day#ma#" + fund['symbol'])
+            if result is not None and result != "":
+                charge['day'] = {}
+                sum_js = json.loads(result)
+                for per in periods:
+                    sum = sum_js["ma" + str(per)] + float(ret['gsz'])
+                    charge["day"]["ma" + str(per + 1)] = round(float(sum / (per + 1)),3)
+                
             rd.Publish("fund#1d#" + fund['symbol'], json.dumps(charge))
             rd.Set("fund#1d#" + fund['symbol'], json.dumps(charge))
 

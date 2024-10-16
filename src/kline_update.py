@@ -70,22 +70,27 @@ def update_stock_kline(cf, sql_handel):
             beg = ""
         his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "day", beg, local_time[:8])
         sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "day")
+        date = sql_handel.get_stock_last_klines(stock[0], "week")
+        if date is not None:
+            beg = TimeFormat.format_date(date)
+        else:
+            beg = ""
+        his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "week", beg, local_time[:8])
         if TimeFormat.is_first_day_of_week(local_time):
-            date = sql_handel.get_stock_last_klines(stock[0], "week")
-            if date is not None:
-                beg = TimeFormat.format_date(date)
-            else:
-                beg = ""
-            his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "week", beg, local_time[:8])
             sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "week")
+        else:
+            sql_handel.insert_stock_kline(his["data"]["klines"][:-1], stock[0], "week")
+
+        date = sql_handel.get_stock_last_klines(stock[0], "month")
+        if date is not None:
+            beg = TimeFormat.format_date(date)
+        else:
+            beg = ""
+        his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "month", beg, local_time[:8])
         if TimeFormat.is_first_day_of_month(local_time):
-            date = sql_handel.get_stock_last_klines(stock[0], "month")
-            if date is not None:
-                beg = TimeFormat.format_date(date)
-            else:
-                beg = ""
-            his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "month", beg, local_time[:8])
             sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "month")
+        else:
+            sql_handel.insert_stock_kline(his["data"]["klines"][:-1], stock[0], "month")
 
 def main():
     cf = yaml_load()
