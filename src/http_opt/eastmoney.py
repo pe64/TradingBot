@@ -4,6 +4,7 @@ import json
 import sys
 import datetime
 import time
+import base64
 import hashlib
 from http import cookiejar
 from urllib import request,parse
@@ -98,7 +99,7 @@ class HttpEM:
         with open(final_path, "wb") as f:
             f.write(text)
         
-    def login_em_ver_code(self):
+    def login_em_ver_code(self) -> str:
         code_path = self.ver_conf["file"] + str(self.account_id) + ".jpg"
 
         url = self.ver_conf['url'] + "?" + "randNum=" + self.random 
@@ -108,7 +109,9 @@ class HttpEM:
         text = resp.read()
         with open(code_path, "wb") as f:
             f.write(text)
-        os.system("catimg "+code_path)
+        
+        return base64.b64encode(text).decode('utf-8')
+        #os.system("catimg "+code_path)
         #self.ver_code = ocr_em(code_path)
         #if self.ver_code != None and len(self.ver_code) == 6:
         #    break
@@ -130,14 +133,14 @@ class HttpEM:
         except:
             return {"Status":0}
 
-    def login_em_platform(self):
+    def login_em_platform(self, ver_code = None):
         url = self.login_conf["url"]
         path = self.ver_conf["file"] + str(self.account_id) + ".jpg"
         headers = self.build_headers(self.login_conf["headers"])
         rsa = JSEncrypt(self.login_conf["private_key"])
         self.login_js["password"] = rsa.rsa_long_encrypt(self.password)
-        print("input ver code:")
-        self.login_js["identifyCode"] = sys.stdin.readline().strip()
+        #self.login_js["identifyCode"] = sys.stdin.readline().strip()
+        self.login_js["identifyCode"] = ver_code
         self.login_js["randNumber"] = self.random
         js = self.http_post(url, arg=self.login_js, headers=headers)
         if js["Status"] == 0:

@@ -1,3 +1,4 @@
 src/*/__pycache__
 cache/*
 conf/litellm.yaml
+conf/api_key.yaml

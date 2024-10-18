@@ -1,19 +1,20 @@
 import time
-from utils.yaml_conf import yaml_load
+from utils.yaml_conf import yaml_load, api_yaml_load
 from cta.eastmoney_cta import EastMoneyCta
 from http_opt.eastmoney import HttpEM
 from utils.redis import Redis
 from utils.time_format import TimeFormat
+from gpt.openrouter import OpenRouterService
 
 def login_and_update_cookies(htp, rds):
-    htp.login_em_ver_code()
-    ret = htp.login_em_platform()
+    img = htp.login_em_ver_code()
+    ver_code = gpt.ocr(img)
+    htp.login_em_platform(ver_code)
     rds.UpdateEastMoneyCookies(htp.account_id)
-
-    return ret == 0
 
 if __name__ == "__main__":
     cf = yaml_load()
+    api_cf = api_yaml_load()
     em = EastMoneyCta(cf)
     rds = Redis(cf['redis']['url'], cf['redis']['port'])
     htps = []
@@ -21,27 +22,21 @@ if __name__ == "__main__":
     for account in accounts:
         htps.append(HttpEM(cf, account))
     
+    gpt = OpenRouterService(cf['gpt'], api_cf)
     while True:
         for htp in htps:
             try:
                 if False == htp.get_validate_key():
-                    htp.login_em_ver_code()
-                    htp.login_em_platform()
-                    rds.UpdateEastMoneyCookies(htp.account_id)
-
+                    login_and_update_cookies(htp, rds)
 
                 status, data = htp.get_asset()
                 if status == -2:
-                    htp.login_em_ver_code()
-                    htp.login_em_platform()
-                    rds.UpdateEastMoneyCookies(htp.account_id)
+                    login_and_update_cookies(htp, rds)
                     status, data = htp.get_asset()
                 
                 status, fund = htp.get_fund_asset()
                 if status != 0:
-                    htp.login_em_ver_code()
-                    htp.login_em_platform()
-                    rds.UpdateEastMoneyCookies(htp.account_id)
+                    login_and_update_cookies(htp, rds)
                     status, fund = htp.get_fund_asset()
 
                 print("\033[33m[%s]账户:%s 登陆成功\033[0m"%(TimeFormat.get_local_timstamp(),htp.get_user_id()),end="|")

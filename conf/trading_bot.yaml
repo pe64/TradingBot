@@ -19,6 +19,18 @@ virtual:
   sqlite_path: "db_file/virtual.db"
   cash: 1000
 
+gpt:
+  OPENAI_API_URL: "http://127.0.0.1:4000/v1"
+  GPT_PROMOTE:
+    OCR_PROMOTE: "你是一个图像数字识别助手，请帮我识别图像中的数字，并只返回以下 JSON 格式：
+
+                  {
+                    \"ErrCode\": 0,  // 表示识别是否成功, 0表示成功, -1表示失败
+                    \"VerCode\": \"识别到的数字内容\"  // 图像中的数字内容，如果识别失败则为空字符串
+                  }
+
+                  注意：只返回上述 JSON 格式，不包含其他任何内容。"
+
 logging:
   format: "%(asctime)s - %(levelname)s - %(message)s"
   file: log/trading.log
