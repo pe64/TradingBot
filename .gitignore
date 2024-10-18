@@ -1,2 +1,3 @@
 src/*/__pycache__
 cache/*
+conf/litellm.yaml
