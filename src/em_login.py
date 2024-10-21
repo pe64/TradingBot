@@ -39,6 +39,7 @@ if __name__ == "__main__":
                 if status != 0:
                     login_and_update_cookies(htp, rds)
                     status, fund = htp.get_fund_asset()
+                    continue
 
                 print("\033[33m[%s]账户:%s 登陆成功\033[0m"%(TimeFormat.get_local_timstamp(),htp.get_user_id()),end="|")
                 for node in data:

@@ -32,7 +32,7 @@ gpt:
                     \"VerCode\": \"识别到的数字内容\"  // 图像中的数字内容，如果识别失败则为空字符串
                   }
 
-                  注意：只返回上述 JSON 格式，不包含其他任何内容。"
+                  注意：只返回上述的 JSON 格式，不返回 markdown 格式，并且不包含其他任何内容。"
 
 logging:
   format: "%(asctime)s - %(levelname)s - %(message)s"
