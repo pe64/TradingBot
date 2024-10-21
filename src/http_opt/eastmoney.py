@@ -6,6 +6,8 @@ import datetime
 import time
 import base64
 import hashlib
+import io
+from PIL import Image
 from http import cookiejar
 from urllib import request,parse
 from http_opt.fund51_http import get_time_day, get_time_strl
@@ -95,7 +97,7 @@ class HttpEM:
         sha256_hash = hashlib.sha256()
         sha256_hash.update(text)
         hash_hex = sha256_hash.hexdigest()
-        final_path = f"cache/{hash_hex}.jpg"
+        final_path = f"cache/ver_data/{hash_hex}.jpg"
         with open(final_path, "wb") as f:
             f.write(text)
         
@@ -106,11 +108,30 @@ class HttpEM:
         headers = self.build_headers(self.ver_conf["headers"])
         req = request.Request(url, headers=headers)
         resp = self.opener.open(req)
-        text = resp.read()
+        img_data = resp.read()
         with open(code_path, "wb") as f:
-            f.write(text)
+            f.write(img_data)
         
-        return base64.b64encode(text).decode('utf-8')
+        image = Image.open(io.BytesIO(img_data))
+
+        # 转为灰度图像
+        gray_image = image.convert('L')
+        gray_image.save(code_path+"_gray.jpg")
+        # 将图像转换为二进制数据以便进行base64编码
+        # 二值化处理：设置阈值
+        #threshold = 128  # 可根据实际情况调整阈值
+        #binary_image = gray_image.point(lambda p: 255 if p > threshold else 0)
+        #binary_image.save(code_path + "_binary.jpg")
+        
+        buffer = io.BytesIO()
+        gray_image.save(buffer, format="JPEG")
+        img_bytes = buffer.getvalue()
+
+        # 进行base64编码并返回字符串
+        base64_str = base64.b64encode(img_bytes).decode('utf-8')
+    
+        return base64_str
+        #return base64.b64encode(text).decode('utf-8')
         #os.system("catimg "+code_path)
         #self.ver_code = ocr_em(code_path)
         #if self.ver_code != None and len(self.ver_code) == 6:
@@ -291,8 +312,10 @@ class HttpEM:
         }
 
         js = self.http_post(url, arg=data, headers=headers)
-        
-        return js['Status'], js["Data"]
+        if js.get("Status", 0) != 0:
+            return js["Status"], None
+        else:
+            return js['Status'], js["Data"]
 
     def get_fund_position(self):
         url = self.get_fund_position_conf["url"] + self.validatekey
@@ -465,8 +488,10 @@ class HttpEM:
         headers = self.build_headers(self.get_asset_conf['headers'])
         data = {}
         js = self.http_post(url, data, headers)
-
-        return js["Status"], js['Data']
+        if js.get("Status", -2) != 0:
+            return js["Status"], None
+        else:
+            return js["Status"], js['Data']
 
     def get_ttb_code(self):
         url = self.ttb_code_conf['url']

@@ -9,6 +9,7 @@ from gpt.openrouter import OpenRouterService
 def login_and_update_cookies(htp, rds):
     img = htp.login_em_ver_code()
     ver_code = gpt.ocr(img)
+    print("ver code:" + ver_code)
     htp.login_em_platform(ver_code)
     rds.UpdateEastMoneyCookies(htp.account_id)
 
@@ -64,4 +65,4 @@ if __name__ == "__main__":
                 print("error:", e)
                 continue
         
-        time.sleep(60)     
+        time.sleep(300)     
