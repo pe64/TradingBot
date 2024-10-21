@@ -58,7 +58,6 @@ class HttpEM:
         self.user_id = account['userId']
         self.login_js = account
         self.password = self.login_js['password']
-        self.new_stock_flag = False
         pass
     
     def update_cookie(self):

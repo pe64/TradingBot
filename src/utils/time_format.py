@@ -208,3 +208,18 @@ class TimeFormat:
         formatted_date = date.strftime("%Y%m%d")
     
         return formatted_date
+    
+    @staticmethod
+    def is_work_day(date_string):
+        # 将日期字符串转换为 datetime 对象
+        date_obj = datetime.strptime(date_string, "%Y%m%d%H%M%S")
+    
+        # 获取星期几，星期一为 0，星期日为 6
+        day_of_week = date_obj.weekday()
+    
+        # 如果是周一到周五，返回 True（工作日），否则返回 False（非工作日）
+        if day_of_week < 5:
+            return True
+        else:
+            return False
+        

@@ -40,8 +40,10 @@ if __name__ == "__main__":
                     login_and_update_cookies(htp, rds)
                     status, fund = htp.get_fund_asset()
                     continue
+                
+                ts = TimeFormat.get_local_timstamp()
 
-                print("\033[33m[%s]账户:%s 登陆成功\033[0m"%(TimeFormat.get_local_timstamp(),htp.get_user_id()),end="|")
+                print("\033[33m[%s]账户:%s 登陆成功\033[0m"%(ts,htp.get_user_id()),end="|")
                 for node in data:
                     if node['Ljyk'] is None:
                         print("\033[33m总资产:%s元,可用金额:%s元,持仓盈亏:0元\033[0m"%(node['Zzc'],node['Kyzj']), end=',') 
@@ -59,7 +61,8 @@ if __name__ == "__main__":
                         print("\033[33m基金盈亏:\033[31m%s\033[33m元.\033[0m"%(f['Jjyk']))
                     pass
 
-                if htp.new_stock_flag is False:
+                if TimeFormat.is_time_between(ts, cf['period']['new_asset']['start'], 
+                            cf['period']['new_asset']['end']) and TimeFormat.is_work_day(ts) is True:
                     em.submit_new_asset(htp)
 
             except Exception as e:
