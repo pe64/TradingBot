@@ -312,7 +312,7 @@ class HttpEM:
         }
 
         js = self.http_post(url, arg=data, headers=headers)
-        if js.get("Status", 0) != 0:
+        if js.get("Status", -2) != 0:
             return js["Status"], None
         else:
             return js['Status'], js["Data"]

@@ -21,6 +21,7 @@ virtual:
 
 gpt:
   OPENAI_API_URL: "http://127.0.0.1:4000/v1"
+  MODEL: "openai/gpt-4o"
   GPT_PROMOTE:
     OCR_PROMOTE: "你是一个图像数字识别助手, 图像中有4个数字并且被2条干扰线覆盖, 
                   上面一条干扰线是白色直线, 下面一条干扰线是和数字同色的弧线, 
