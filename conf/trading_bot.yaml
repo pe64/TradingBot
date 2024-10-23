@@ -10,7 +10,7 @@ redis:
   timeout: 10
 
 sqlite_path: "db_file/common.db"
-stock_sqlite: "db_file/stock.db"
+history_db_path: "db_file/history.db"
 
 virtual:
   enabled: false

@@ -7,19 +7,19 @@ from http_opt import stock_http
 from utils.yaml_conf import yaml_load
 from utils.time_format import TimeFormat
 
-def update_fund_kline(cf, sql):
-    fcodes = sql.get_fund_self_selections()
+def update_fund_kline(asset_sql, history_sql, cf):
+    fcodes = asset_sql.get_fund_self_selections()
     for fcode in fcodes:
         his = fund_http.fund_http_history_charge(cf["web_api"]["fund"], fcode[0])
-        sql.insert_fund_history_charges(his, fcode=fcode[0])
+        history_sql.insert_fund_history_charges(his, fcode=fcode[0])
 
-def upload_fund_masum(sql, rd):
+def upload_fund_masum(asset_sql, history_sql, rd):
     periods = [4, 9, 19, 29, 59, 119]
-    fcodes = sql.get_fund_self_selections()
+    fcodes = asset_sql.get_fund_self_selections()
     for fcode in fcodes:
         data = {}
         for per in periods:
-            data['ma' + str(per)]= sql.get_fund_masum(fcode[0], per)
+            data['ma' + str(per)]= history_sql.get_fund_masum(fcode[0], per)
         data['timestamp'] = TimeFormat.get_local_timstamp()
         rd.Set("fund#day#ma#" + fcode[0], json.dumps(data))
     
@@ -34,15 +34,15 @@ def upload_fund_masum(sql, rd):
     rd.Set("timerecord", json.dumps(time_result))
         
 
-def upload_stock_masum(sql, rd):
+def upload_stock_masum(asset_sql, history_sql, rd):
     periods = [4, 9, 19, 29, 59, 119]
     types = ["day", "week", "month"]
-    stocks = sql.get_stock_self_selection()
+    stocks = asset_sql.get_stock_self_selection()
     for type in types:
         for stock in stocks:
             data = {}
             for per in periods:
-                data["ma" + str(per)] = sql.get_stock_masum(stock[0], type, per)
+                data["ma" + str(per)] = history_sql.get_stock_masum(stock[0], type, per)
 
             data['timestamp'] = TimeFormat.get_local_timstamp()
             rd.Set("stock#" + type +"#ma#" + stock[0], json.dumps(data))
@@ -57,45 +57,45 @@ def upload_stock_masum(sql, rd):
     
     rd.Set("timerecord", json.dumps(time_result))
 
-def update_stock_kline(cf, sql_handel):
+def update_stock_kline(asset_sql, history_sql, cf):
     beg = ""
-    stocks = sql_handel.get_stock_self_selection()
+    stocks = asset_sql.get_stock_self_selection()
     local_time = TimeFormat.get_local_timstamp()
     for stock in stocks:
         scode = cf["web_api"]['stock']['market_code'][stock[1]] + "." + stock[0]
-        date = sql_handel.get_stock_last_klines(stock[0], "day")
+        date = history_sql.get_stock_last_klines(stock[0], "day")
         if date is not None:
             beg = TimeFormat.format_date(date)
         else:
             beg = ""
         his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "day", beg, local_time[:8])
-        sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "day")
-        date = sql_handel.get_stock_last_klines(stock[0], "week")
+        history_sql.insert_stock_kline(his["data"]["klines"], stock[0], "day")
+        date = history_sql.get_stock_last_klines(stock[0], "week")
         if date is not None:
             beg = TimeFormat.format_date(date)
         else:
             beg = ""
         his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "week", beg, local_time[:8])
         if TimeFormat.is_first_day_of_week(local_time):
-            sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "week")
+            history_sql.insert_stock_kline(his["data"]["klines"], stock[0], "week")
         else:
-            sql_handel.insert_stock_kline(his["data"]["klines"][:-1], stock[0], "week")
+            history_sql.insert_stock_kline(his["data"]["klines"][:-1], stock[0], "week")
 
-        date = sql_handel.get_stock_last_klines(stock[0], "month")
+        date = history_sql.get_stock_last_klines(stock[0], "month")
         if date is not None:
             beg = TimeFormat.format_date(date)
         else:
             beg = ""
         his = stock_http.stock_http_kline(cf["web_api"]["stock"], scode, "month", beg, local_time[:8])
         if TimeFormat.is_first_day_of_month(local_time):
-            sql_handel.insert_stock_kline(his["data"]["klines"], stock[0], "month")
+            history_sql.insert_stock_kline(his["data"]["klines"], stock[0], "month")
         else:
-            sql_handel.insert_stock_kline(his["data"]["klines"][:-1], stock[0], "month")
+            history_sql.insert_stock_kline(his["data"]["klines"][:-1], stock[0], "month")
 
 def main():
     cf = yaml_load()
-    fund_sq = SqliteObj(cf["sqlite_path"])
-    stock_sq = SqliteObj(cf["sqlite_path"])
+    asset_sq = SqliteObj(cf["sqlite_path"])
+    history_sq = SqliteObj(cf["history_db_path"])
     rd = Redis(cf['redis']['url'], cf['redis']['port'])
     while True:
         local_time = TimeFormat.get_local_timstamp()
@@ -105,10 +105,12 @@ def main():
             time.sleep(1800)
             continue
 
-        update_fund_kline(cf, fund_sq)
-        update_stock_kline(cf, stock_sq)
-        upload_fund_masum(fund_sq, rd)
-        upload_stock_masum(stock_sq, rd)
+        update_fund_kline(asset_sq, history_sq, cf)
+        update_stock_kline(asset_sq, history_sq, cf)
+        upload_fund_masum(asset_sq, history_sq, rd)
+        upload_stock_masum(asset_sq, history_sq, rd)
+
+        time.sleep(600)
         
 
     

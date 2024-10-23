@@ -117,7 +117,7 @@ class AssetCharge:
 
             if self.virtual_flag:
                 days = days + 1
-            time.sleep(10)
+            time.sleep(60)
 
     def upload_asset(self, rd, assets):
         for asset in assets:
