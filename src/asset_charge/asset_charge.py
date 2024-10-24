@@ -1,6 +1,4 @@
-from re import A
 import time
-from datetime import datetime, timedelta
 import json
 from db.asset_db import AssetDB
 from http_opt.fund_http import fund_http_real_time_charge
@@ -9,7 +7,6 @@ from utils.redis import Redis
 from http_opt.binance_http import BinanceOpt
 from asset_charge.stock_charge import StockCharge
 import threading
-from utils.yaml_conf import yaml_load
 from utils.time_format import TimeFormat
 
 class AssetCharge:
@@ -93,11 +90,7 @@ class AssetCharge:
             utc, zone = TimeFormat.get_utc_time(self.virtual_start, days)
         else:
             utc, zone = TimeFormat.get_utc_time()
-        intervals = [
-            "8h", 
-            "1d", 
-            "1w"
-        ]
+        intervals = [ "8h", "1d", "1w" ]
 
         for interval in intervals:
             start_time_stamp = TimeFormat.calculate_time_range(utc, interval)
@@ -142,4 +135,3 @@ class AssetCharge:
         fund_thread.join()
         stock_thread.join()
         coin_thread.join()
-
