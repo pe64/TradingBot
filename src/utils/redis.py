@@ -51,4 +51,4 @@ class Redis:
     
     def UpdateEastMoneyCookies(self, account_id):
         msg ='{"trade":"UPDATE"}'
-        self.r.publish("left#trade#" + str(account_id),msg)
+        self.r.lpush("left#trade#" + str(account_id),msg)

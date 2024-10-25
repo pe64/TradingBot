@@ -84,18 +84,20 @@ class EastMoneyCta:
         redis_client.LTrim("left#trade#" + str(aid))
         redis_client.LTrim("right#trade#" + str(aid))
 
-        while False == htp.get_validate_key() and self.virtual_flag is False:
-            htp.update_cookie()
-            time.sleep(10)
-            continue
-
         while True:
+
+            if False == htp.get_validate_key() and self.virtual_flag is False:
+                htp.update_cookie()
+                time.sleep(10)
+                continue
+
             message = redis_client.BRPop(
                 "left#trade#" + str(aid),0
             )
             order = json.loads(message)
             if order['trade'] == 'UPDATE':
                 htp.update_cookie()
+                print("update cookie.")
                 continue
 
             if self.virtual_flag:
@@ -133,6 +135,7 @@ class EastMoneyCta:
                 
             else:
                 htp.update_cookie()
+                print("update cookie.")
                 #self.update_account_status(htp)
             
             if ret is True:
