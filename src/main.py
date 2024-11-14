@@ -1,10 +1,8 @@
 import sys
 import json
 import time
-import datetime
 #from EastMoney import EastMoney
 from asset_charge.asset_charge import AssetCharge
-from threading import Thread
 from cta.fund51_cta import Fund51Cta
 from utils.yaml_conf import yaml_load
 from http_opt import fund_http
@@ -15,7 +13,6 @@ from cta.virtual_cta import VirtualCta
 from http_opt.fund51_http import HttpFund51
 from http_opt.eastmoney import HttpEM
 from cta.eastmoney_cta import EastMoneyCta
-from utils.redis import Redis
 from http_opt.binance_http import BinanceOpt
 #from ocr.ocr import *
 

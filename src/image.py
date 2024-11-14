@@ -1,5 +1,3 @@
-import cv2
-import numpy as np
 from ocr.ocr import ocr_em
 
 if __name__ == "__main__":
